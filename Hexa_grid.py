@@ -1,13 +1,15 @@
 
-from skimage import io
 import numpy as np
 import matplotlib.pyplot as plt
-import math
-from skimage import color
 import cv2
+
 # centre = centre de l'hexa
 # size = rayon de l hexa (dist entre chaque point et le centre de l'hexa)
 # i = corner nbr (6 in total)
+
+color = 0
+
+thickness = 1
 
 
 def hexPoint(center, size, i):
@@ -17,28 +19,30 @@ def hexPoint(center, size, i):
     return (int(center[0] + size * np.cos(rad_angle)),
             int(center[1] + size * np.sin(rad_angle)))
 
+# dessine un hexagone
 
-def drawHexa(image, center, size, color=(255, 255, 255)):
+
+def drawHexa(image, center, size, vertices=None):
 
     # color = (55, 46, 101)
 
-    thickness = 1
+    if(vertices == None):
 
-    points = getHexaPoints(center, size)
+        points = getHexaVertices(center, size)
 
-    for i in range(1, 6):
+    else:
+
+        points = vertices
+
+    for i in range(6):
 
         image = cv2.line(
             image, points[i-1], points[i], color, thickness, cv2.LINE_AA)
 
-    # last point
-    image = cv2.line(image, points[0], points[-1],
-                     color, thickness, cv2.LINE_AA)
-
     return image
 
 
-def getHexaPoints(center, size):
+def getHexaVertices(center, size):
 
     points = []
 
@@ -54,7 +58,7 @@ def isHexInImage(w, h, center, size):
     # car parfois y a de mini pixels qui flood je sais pas si je dois les considerer
     epsilon = 5
 
-    points = getHexaPoints(center, size)
+    points = getHexaVertices(center, size)
 
     for point in points:
 
@@ -65,8 +69,38 @@ def isHexInImage(w, h, center, size):
             return True
     return False
 
+# the homothty operation
 
-def drawGrid(image, sigma, color=(255, 255, 255)):
+
+def addMargin(image, centers, rho, size):
+
+    new_vertices = []
+
+    for center in centers:
+
+        vertices = getHexaVertices(center, size)
+
+        new_vertices = []
+
+        for v in vertices:
+
+            x, y = v
+
+            new_x = int(rho * (x-center[0]) + center[0])
+            new_y = int(rho * (y-center[1]) + center[1])
+
+            image = cv2.line(
+                image, [new_x, new_y], v, color, thickness, cv2.LINE_AA)
+
+            new_vertices.append([new_x, new_y])
+
+        cv2.fillPoly(image, np.int32(
+            [[new_vertices], [vertices]]), color)
+
+    return image
+
+
+def drawHexaGrid(image, sigma, color=(255, 255, 255), rho=2/3):
     # color image
     if(len(image.shape) == 3):
 
@@ -81,7 +115,7 @@ def drawGrid(image, sigma, color=(255, 255, 255)):
 
     size = sigma / np.sqrt(3)
 
-    center = (0, 0)
+    center = [0, 0]
 
     while isHexInImage(w, h, center, size):
 
@@ -91,14 +125,14 @@ def drawGrid(image, sigma, color=(255, 255, 255)):
 
             centers.append(center)
 
-            cv2.circle(image, (int(center[0]), int(
-                center[1])), 0, color, 5)
+            # cv2.circle(image, (int(center[0]), int(
+            #     center[1])), 0, color, 3)
 
             # The sqrt(3) comes from sin(60°)
-            center = (center[0], center[1] + sigma)
+            center = [center[0], center[1] + sigma]
 
-        center = (center[0] + (3/2)*size,
-                  change*sigma/2)
+        center = [center[0] + (3/2)*size,
+                  change*sigma/2]
 
         if(change == 0):
 
@@ -108,19 +142,15 @@ def drawGrid(image, sigma, color=(255, 255, 255)):
 
             change = 0
 
-    print(len(centers))
+    cv2.imwrite("grid_image.jpg", image)
 
-    plt.imshow(image, cmap='gray')
+    image = addMargin(image, centers, rho, size)
 
-    plt.show()
+    cv2.imwrite("grid_image_with_margin.jpg", image)
+    print("nb centers ", len(centers))
 
+    # plt.imshow(image, cmap='gray')
 
-# img = io.imread('image.jpg')
-img = io.imread('lena.jpg')
+    # plt.show()
 
-
-# conversion to grxay scale image
-gray_img = color.rgb2gray(img)
-
-
-drawGrid(img, 45)
+    return centers
