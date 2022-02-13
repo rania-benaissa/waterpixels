@@ -1,37 +1,43 @@
+from math import dist
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 
+from sklearn.metrics.pairwise import euclidean_distances
+
 
 def euclidianDist(p1, p2):
 
-    dists = np.zeros((len(p2)))
+    dists = euclidean_distances([p1], p2)
 
-    for i in range(len(dists)):
-
-        dists[i] = np.linalg.norm(p1-p2[i])
-
-    return dists
+    return dists[0].min()
 
 
 # la je dois retourner une image avec le min d * 2/ sigma
+def voronoiTesselation(shape, centers, sigma):
 
+    print(len(centers))
 
-def voronoiTesselation(image, centers, sigma):
     # voronoi diagram
-    diagram = np.zeros((image.shape))
+    diagram = np.zeros(shape)
+    # height
+    for i in range(diagram.shape[0]):
+        # width
+        for j in range(diagram.shape[1]):
 
-    for i in range(image.shape[0]):
-        for j in range(image.shape[1]):
+            diagram[i, j] = euclidianDist(
+                np.array([i, j]), np.array(centers))
 
-            diagram[i, j] = np.min(euclidianDist(
-                np.array([i, j]), np.array(centers)))
+        # diagram = (2/sigma) * diagram
 
-    diagram = (2/sigma) * diagram
+        # plt.imshow(diagram, cmap="gray")
+        # plt.show()
 
-    plt.imshow(diagram, cmap="gray")
-    plt.show()
+        cv2.imwrite("voronoi.jpg", diagram)
 
-    #cv2.imwrite("voronoi.jpg", diagram)
+        # print(euclidean_distances(
+        #     np.array([[243, 413]]), np.array(centers))[0])
 
-    # return (2/sigma) * diagram
+        # print(diagram[243, 413])
+
+        # return (2/sigma) * diagram

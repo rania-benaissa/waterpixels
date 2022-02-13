@@ -3,9 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
-# centre = centre de l'hexa
-# size = rayon de l hexa (dist entre chaque point et le centre de l'hexa)
-# i = corner nbr (6 in total)
 
 color = 0
 
@@ -13,26 +10,47 @@ thickness = 1
 
 
 def hexPoint(center, size, i):
+    """Calculates the position of the vertex i of an hexagon.
+
+    Parameters
+    ----------
+        center : the center of the hexagon.
+
+        size : radius of the hexagon (distance between every vertex and its center).
+
+        i : vertex number.
+
+    Returns:
+    ----------
+    A tuple (x,y) which represents the position of vertex i in the grid.
+
+    """
 
     degree_angle = 60 * i
     rad_angle = np.deg2rad(degree_angle)
+
     return (int(center[0] + size * np.cos(rad_angle)),
             int(center[1] + size * np.sin(rad_angle)))
 
-# dessine un hexagone
 
+def drawHexa(image, center, size):
+    """Draws an hexagon in an image.
 
-def drawHexa(image, center, size, vertices=None):
+    Parameters
+    ----------
+        image : the image where the hexagon is drawn.
 
-    # color = (55, 46, 101)
+        center : the center of the hexagon.
 
-    if(vertices == None):
+        size : the radius of the hexagon (distance between every vertex and its center).
 
-        points = getHexaVertices(center, size)
+    Returns:
+    ----------
+    The modified image.
 
-    else:
+    """
 
-        points = vertices
+    points = getHexaVertices(center, size)
 
     for i in range(6):
 
@@ -43,7 +61,19 @@ def drawHexa(image, center, size, vertices=None):
 
 
 def getHexaVertices(center, size):
+    """Computes the hexagon's vertices.
 
+    Parameters
+    ----------
+        center : the center of the hexagon.
+
+        size : radius of the hexagon (distance between every vertex and its center).
+
+    Returns:
+    ----------
+    points : list of vertices positions.
+
+    """
     points = []
 
     for i in range(0, 6):
@@ -54,9 +84,26 @@ def getHexaVertices(center, size):
 
 
 def isHexInImage(w, h, center, size):
+    """Check if a hexagon is in an image given its dimensions.
 
-    # car parfois y a de mini pixels qui flood je sais pas si je dois les considerer
-    epsilon = 5
+    Parameters
+    ----------
+        w : width of the image.
+
+        h : height of the image.
+
+        center : the center of the hexagon.
+
+        size : radius of the hexagon (distance between every vertex and its center).
+
+    Returns:
+    ----------
+    bool : True, if the hexagon is inside the image, False otherwise.
+
+    """
+
+    # dunno if i should consider all pixels
+    epsilon = 0
 
     points = getHexaVertices(center, size)
 
@@ -64,15 +111,28 @@ def isHexInImage(w, h, center, size):
 
         x, y = point
 
-        if(x >= 0 and x+epsilon < w and y >= 0 and y+epsilon < h):
+        if(x >= 0 and x+epsilon <= h and y >= 0 and y+epsilon <= w):
 
             return True
     return False
 
-# the homothty operation
-
 
 def addMargin(image, centers, rho, size):
+    """Computes homothety centered on hexagons centers.
+
+    Parameters
+    ----------
+        image : image with an hexagonal grid
+
+        centers : hexagon's centers.
+
+        rho : homothety factor [0,1].
+
+    Returns:
+    ----------
+    image : the image with a modified grid.
+
+    """
 
     new_vertices = []
 
@@ -100,7 +160,22 @@ def addMargin(image, centers, rho, size):
     return image
 
 
-def drawHexaGrid(image, sigma, color=(255, 255, 255), rho=2/3):
+def drawHexaGrid(image, sigma, rho=2/3):
+    """Draws an hexagonal grid on an image.
+
+    Parameters
+    ----------
+        image : color or gray-scale image.
+
+        sigma : the grid step.
+
+        rho : homothety factor [0,1].
+
+    Returns:
+    ----------
+    centers : the grid centers.
+
+    """
     # color image
     if(len(image.shape) == 3):
 
@@ -119,20 +194,26 @@ def drawHexaGrid(image, sigma, color=(255, 255, 255), rho=2/3):
 
     while isHexInImage(w, h, center, size):
 
+        # la boucle interne est celle du H
         while(isHexInImage(w, h, center, size)):
 
-            image = drawHexa(image, center, size)
+            # needed to invert the center
+            # coz cv2 works with w *h
+            # meanwhile i m workin with h * w
+            image = drawHexa(image, center[::-1], size)
 
             centers.append(center)
 
-            # cv2.circle(image, (int(center[0]), int(
-            #     center[1])), 0, color, 3)
+            cv2.circle(image, (int(center[1]), int(
+                center[0])), 0, color, 3)
 
-            # The sqrt(3) comes from sin(60°)
-            center = [center[0], center[1] + sigma]
+            plt.imshow(image, cmap="gray")
+            plt.show()
 
-        center = [center[0] + (3/2)*size,
-                  change*sigma/2]
+            # The sqrt(3) comes from sin(60°) , x =hauteur, y = largeur
+            center = [center[0] + sigma, center[1]]
+
+        center = [change*sigma/2, center[1] + (3/2)*size]
 
         if(change == 0):
 
@@ -143,14 +224,10 @@ def drawHexaGrid(image, sigma, color=(255, 255, 255), rho=2/3):
             change = 0
 
     cv2.imwrite("grid_image.jpg", image)
-
+    # homothety operation
     image = addMargin(image, centers, rho, size)
 
     cv2.imwrite("grid_image_with_margin.jpg", image)
     print("nb centers ", len(centers))
-
-    # plt.imshow(image, cmap='gray')
-
-    # plt.show()
 
     return centers

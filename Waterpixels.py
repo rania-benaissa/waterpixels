@@ -1,5 +1,7 @@
 # importing PIL
+import time
 import cv2
+from cv2 import RHO
 import matplotlib.pyplot as plt
 from Gradient import SobelOperator
 from skimage import io
@@ -25,11 +27,18 @@ from Voronoi_tesselation import voronoiTesselation
 img = cv2.imread("image.jpg")
 
 
-# conversion to grxay scale image
+# conversion to gray scale image
 gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 sigma = 40
-centers = drawHexaGrid(gray_img, sigma)
+
+rho = 2/3
+centers = drawHexaGrid(gray_img, sigma, rho=rho)
+print(gray_img.shape)
+# start_time = time.time()
 
 
-voronoiTesselation(gray_img, centers, sigma)
+# end_time = time.time()
+
+
+# print("voronoi = ", end_time-start_time)
