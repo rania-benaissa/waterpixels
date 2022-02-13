@@ -207,8 +207,8 @@ def drawHexaGrid(image, sigma, rho=2/3):
             cv2.circle(image, (int(center[1]), int(
                 center[0])), 0, color, 3)
 
-            plt.imshow(image, cmap="gray")
-            plt.show()
+            # plt.imshow(image, cmap="gray")
+            # plt.show()
 
             # The sqrt(3) comes from sin(60°) , x =hauteur, y = largeur
             center = [center[0] + sigma, center[1]]

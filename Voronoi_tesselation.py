@@ -2,15 +2,15 @@ from math import dist
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-
+from itertools import product
 from sklearn.metrics.pairwise import euclidean_distances
 
+# it computes that for a row
 
-def euclidianDist(p1, p2):
 
-    dists = euclidean_distances([p1], p2)
+def euclidianDist(a, row, centers):
 
-    return dists[0].min()
+    return a + euclidean_distances(row, centers).min(axis=1)
 
 
 # la je dois retourner une image avec le min d * 2/ sigma
@@ -20,24 +20,26 @@ def voronoiTesselation(shape, centers, sigma):
 
     # voronoi diagram
     diagram = np.zeros(shape)
-    # height
+
     for i in range(diagram.shape[0]):
-        # width
-        for j in range(diagram.shape[1]):
+        # je reecup les indices d'une ligne i
+        row = list(product([i], np.arange(diagram.shape[1])))
+        # j'applique ma fonction sur chaque ligne
+        diagram[i, :] = np.apply_along_axis(
+            euclidianDist, 0, diagram[i, :], row, centers)
 
-            diagram[i, j] = euclidianDist(
-                np.array([i, j]), np.array(centers))
+    print(diagram)
 
-        # diagram = (2/sigma) * diagram
+    cv2.imwrite("voronoi.jpg", (2/sigma) * diagram)
 
-        # plt.imshow(diagram, cmap="gray")
-        # plt.show()
+    return (2/sigma) * diagram
 
-        cv2.imwrite("voronoi.jpg", diagram)
 
-        # print(euclidean_distances(
-        #     np.array([[243, 413]]), np.array(centers))[0])
+# pixels = [[1, 2], [3, 4]]
+# centers = [[0, 2], [1, 1], [0, 0]]
+# print(euclidean_distances(pixels, centers))
 
-        # print(diagram[243, 413])
-
-        # return (2/sigma) * diagram
+# print(euclidean_distances(pixels, centers).min(axis=1))
+comb = list(product([1], [1, 2, 3,
+                          10]))
+print(comb)
