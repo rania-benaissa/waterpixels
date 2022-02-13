@@ -34,11 +34,10 @@ sigma = 40
 
 rho = 2/3
 centers = drawHexaGrid(gray_img, sigma, rho=rho)
-print(gray_img.shape)
-start_time = time.time()
-
-voronoiTesselation(gray_img.shape, centers, sigma)
-end_time = time.time()
 
 
-print("voronoi = ", end_time-start_time)
+imageCells = voronoiTesselation(gray_img.shape, centers, sigma)
+
+plt.imshow(imageCells, cmap='gray')
+
+plt.show()
