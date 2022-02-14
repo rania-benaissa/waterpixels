@@ -117,7 +117,7 @@ def isHexInImage(w, h, center, size):
     return False
 
 
-def addMargin(image, centers, rho, size):
+def addMargin(img, centers, rho, size):
     """Computes homothety centered on hexagons centers.
 
     Parameters
@@ -133,21 +133,22 @@ def addMargin(image, centers, rho, size):
     image : the image with a modified grid.
 
     """
+    image = img.copy()
 
     new_vertices = []
 
     for center in centers:
-
-        vertices = getHexaVertices(center, size)
+        # inversed centers so that it can be drawn
+        vertices = getHexaVertices(center[::-1], size)
 
         new_vertices = []
 
         for v in vertices:
 
             x, y = v
-
-            new_x = int(rho * (x-center[0]) + center[0])
-            new_y = int(rho * (y-center[1]) + center[1])
+            # just inversed the positions so that it can be drawn
+            new_x = int(rho * (x-center[1]) + center[1])
+            new_y = int(rho * (y-center[0]) + center[0])
 
             image = cv2.line(
                 image, [new_x, new_y], v, color, thickness, cv2.LINE_AA)
@@ -160,7 +161,7 @@ def addMargin(image, centers, rho, size):
     return image
 
 
-def drawHexaGrid(image, sigma, rho=2/3):
+def drawHexaGrid(img, sigma, rho=2/3):
     """Draws an hexagonal grid on an image.
 
     Parameters
@@ -176,6 +177,8 @@ def drawHexaGrid(image, sigma, rho=2/3):
     centers : the grid centers.
 
     """
+
+    image = img.copy()
     # color image
     if(len(image.shape) == 3):
 
