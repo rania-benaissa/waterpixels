@@ -16,18 +16,20 @@ def gaussianKernel(sigma):
     return kern/kern.sum()
 
 
-def SobelOperator(image, sigma):
+def SobelOperator(image, sigma=None):
 
     s_x = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
 
     s_y = s_x.T
 
-    smooth_image = signal.convolve2d(image, gaussianKernel(sigma), mode='same')
+    if(sigma != None):
 
-    g_x = signal.convolve2d(smooth_image, s_x, mode='same')
+        image = signal.convolve2d(image, gaussianKernel(sigma), mode='same')
 
-    g_y = signal.convolve2d(smooth_image, s_y, mode='same')
+    g_x = signal.convolve2d(image, s_x, mode='same')
 
+    g_y = signal.convolve2d(image, s_y, mode='same')
+    # magnitude
     return np.sqrt(np.power(g_x, 2) + np.power(g_y, 2))
 
 
@@ -38,3 +40,20 @@ def SobelOperator(image, sigma):
 
 def morphological_gradient():
     pass
+
+
+def computeMinimas(img):
+
+    image = np.zeros((img.shape[0], img.shape[1], 3))
+    print(image.shape)
+    image[:, :] = [255, 255, 255]
+
+    mini = np.amin(img)
+
+    print(mini)
+
+    indices = np.where(img == mini)
+
+    image[indices[0], indices[1]] = [0, 0, 0]
+
+    return image

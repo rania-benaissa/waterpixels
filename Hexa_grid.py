@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import cv2
 
 
-color = 0
+color = [213.0, 8.0, 47.0][::-1]
 
 thickness = 1
 
@@ -207,8 +207,8 @@ def drawHexaGrid(img, sigma, rho=2/3):
 
             centers.append(center)
 
-            cv2.circle(image, (int(center[1]), int(
-                center[0])), 0, color, 3)
+            # cv2.circle(image, (int(center[1]), int(
+            #     center[0])), 0, color, 3)
 
             # plt.imshow(image, cmap="gray")
             # plt.show()
@@ -233,4 +233,4 @@ def drawHexaGrid(img, sigma, rho=2/3):
     cv2.imwrite("grid_image_with_margin.jpg", image)
     print("nb centers ", len(centers))
 
-    return centers
+    return image, centers
