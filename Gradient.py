@@ -1,9 +1,9 @@
-import py
-
-
-# both gray and color
+from matplotlib import pyplot as plt
 import numpy as np
 from scipy import signal
+from skimage import measure
+from skimage.draw import polygon
+from skimage.color import label2rgb
 
 
 def gaussianKernel(sigma):
@@ -42,18 +42,17 @@ def morphological_gradient():
     pass
 
 
-def computeMinimas(img):
+def computeMinima(img, centers=None, size=None):
 
-    image = np.zeros((img.shape[0], img.shape[1], 3))
-    print(image.shape)
-    image[:, :] = [255, 255, 255]
+    image = np.full((img.shape[0], img.shape[1], 3), 255)
 
     mini = np.amin(img)
-
-    print(mini)
-
+    # indices where gradient is min
     indices = np.where(img == mini)
 
     image[indices[0], indices[1]] = [0, 0, 0]
 
+    # for center in centers
+
+    #getHexaVertices(center, size)
     return image
