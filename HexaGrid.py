@@ -6,7 +6,7 @@ import cv2
 
 class HexaGrid():
 
-    def __init__(self, sigma, rho, color=[213.0, 8.0, 47.0], thickness=1):
+    def __init__(self, sigma, rho, color=[93, 131, 155], thickness=1):
         """Constructor
 
         Parameters
@@ -106,6 +106,38 @@ class HexaGrid():
 
         return points
 
+    def getHomoHexaVertices(self, center):
+        """Computes the hexagon's vertices after homothety (inversed centers).
+
+        Parameters
+        ----------
+            center : the center of the hexagon.
+
+
+        Returns:
+        ----------
+        points : list of vertices positions.
+
+        """
+
+        new_vertices = []
+
+        # inversed centers so that it can be drawn
+        vertices = self.getHexaVertices(center[::-1])
+
+        new_vertices = []
+
+        for v in vertices:
+
+            x, y = v
+            # just inversed the positions so that it can be drawn
+            new_x = int(self.rho * (x-center[1]) + center[1])
+            new_y = int(self.rho * (y-center[0]) + center[0])
+
+            new_vertices.append([new_x, new_y])
+
+        return new_vertices
+
     def isHexInImage(self, w, h, center):
         """Check if a hexagon is in an image given its dimensions.
 
@@ -126,7 +158,7 @@ class HexaGrid():
         """
 
         # dunno if i should consider all pixels
-        epsilon = 0
+        epsilon = 10
 
         points = self.getHexaVertices(center)
 

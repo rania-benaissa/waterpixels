@@ -1,8 +1,9 @@
-from matplotlib import pyplot as plt
+from matplotlib import patches
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from skimage import measure
-from skimage.draw import polygon
+import cv2
+from skimage.measure import label, regionprops, regionprops_table
 from skimage.color import label2rgb
 
 
@@ -16,7 +17,9 @@ def gaussianKernel(sigma):
     return kern/kern.sum()
 
 
-def SobelOperator(image, sigma=None):
+def SobelOperator(img, sigma=None):
+
+    image = img.copy()
 
     s_x = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
 
@@ -38,21 +41,69 @@ def SobelOperator(image, sigma=None):
 # a morphological gradient is the difference between the dilation and the erosion of a given image.
 
 
-def morphological_gradient():
-    pass
+def morphologicalGradient(image):
+
+    img = image.copy()
+
+    struct_elt = np.ones((4, 4), np.uint8)
+
+    return cv2.dilate(img, struct_elt) - cv2.erode(img, struct_elt)
 
 
-def computeMinima(img, centers=None, size=None):
+def computeMinima(img, hexaGrid, color=[86, 76, 115]):
 
-    image = np.full((img.shape[0], img.shape[1], 3), 255)
+    image = np.full((img.shape[0], img.shape[1], 3), 0)
 
-    mini = np.amin(img)
-    # indices where gradient is min
-    indices = np.where(img == mini)
+    for center in hexaGrid.centers:
 
-    image[indices[0], indices[1]] = [0, 0, 0]
+        vertices = np.int32(hexaGrid.getHomoHexaVertices(
+            center))
 
-    # for center in centers
+        # cv2.polylines(img_poly, [vertices], True, (255), 4)
 
-    #getHexaVertices(center, size)
+        # create mask for my polygon
+        mask = np.zeros_like(img)
+        cv2.fillPoly(mask, [vertices], (255))
+
+        # get the indices inside the poly
+        hex_indices = np.where(mask == 255)
+
+        if(hex_indices[0] != [] and hex_indices[1] != []):
+            # get the local minimum
+            mini = np.amin(img[hex_indices])
+
+            indices = np.where(img[hex_indices] == mini)
+
+            image[hex_indices[0][indices], hex_indices[1]
+                  [indices]] = color[::-1]
+
+    labeled, nb = label(np.array(cv2.cvtColor(image.astype(
+        np.float32), cv2.COLOR_BGR2RGB)), return_num=True)
+
+    print("labels nb = ", nb)
+
+    plt.imshow(np.array(cv2.cvtColor(labeled.astype(
+        np.float32), cv2.COLOR_BGR2RGB), np.uint8))
+    plt.show()
+
+    print(image.shape)
+
+    # for region in regionprops(labeled):
+    #     image[:, :, :] = 0
+    #     # image[region.coords] = color + [10, 10, 10]
+
+    #     # print(region.coords.shape)
+
+    #     for coord in region.coords:
+    #         x, y, z = coord
+
+    #         image[x, y, z] = 210
+
+    #     plt.imshow(np.array(cv2.cvtColor(image.astype(
+    #         np.float32), cv2.COLOR_BGR2RGB), np.uint8))
+
+    #     plt.show()
+
+    print(regionprops(labeled).shape)
+
     return image
