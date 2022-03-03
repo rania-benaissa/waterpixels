@@ -1,3 +1,4 @@
+from os import stat
 from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
@@ -50,16 +51,21 @@ def morphologicalGradient(image):
     return cv2.dilate(img, struct_elt) - cv2.erode(img, struct_elt)
 
 
-def computeMinima(img, hexaGrid, color=[86, 76, 115]):
+def computeLocalMinimas(img, hexaGrid, color=[86, 76, 115]):
+    #image = np.full((img.shape[0], img.shape[1], 3), 0)
 
-    image = np.full((img.shape[0], img.shape[1], 3), 0)
+    # connected component of all cells
+    cellsComps = []
 
     for center in hexaGrid.centers:
+
+        binary_image = np.full((img.shape), 0, dtype=np.uint8)
 
         vertices = np.int32(hexaGrid.getHomoHexaVertices(
             center))
 
-        # cv2.polylines(img_poly, [vertices], True, (255), 4)
+        # connected component of a cell
+        cellComponents = []
 
         # create mask for my polygon
         mask = np.zeros_like(img)
@@ -68,42 +74,40 @@ def computeMinima(img, hexaGrid, color=[86, 76, 115]):
         # get the indices inside the poly
         hex_indices = np.where(mask == 255)
 
+        # this condition treats borders
         if(hex_indices[0] != [] and hex_indices[1] != []):
             # get the local minimum
             mini = np.amin(img[hex_indices])
 
             indices = np.where(img[hex_indices] == mini)
 
-            image[hex_indices[0][indices], hex_indices[1]
-                  [indices]] = color[::-1]
+            # image[hex_indices[0][indices], hex_indices[1]
+            #       [indices]] = color[::-1]
 
-    labeled, nb = label(np.array(cv2.cvtColor(image.astype(
-        np.float32), cv2.COLOR_BGR2RGB)), return_num=True)
+            binary_image[hex_indices[0][indices], hex_indices[1]
+                         [indices]] = 255
 
-    print("labels nb = ", nb)
+            numLabels, labels, _, _ = cv2.connectedComponentsWithStats(
+                binary_image, connectivity=8)
 
-    plt.imshow(np.array(cv2.cvtColor(labeled.astype(
-        np.float32), cv2.COLOR_BGR2RGB), np.uint8))
-    plt.show()
+            for i in range(1, numLabels):
 
-    print(image.shape)
+                cellComponents.append(np.argwhere(labels == i))
 
-    # for region in regionprops(labeled):
-    #     image[:, :, :] = 0
-    #     # image[region.coords] = color + [10, 10, 10]
+        cellsComps.append(np.array(cellComponents))
 
-    #     # print(region.coords.shape)
+    return cellsComps
 
-    #     for coord in region.coords:
-    #         x, y, z = coord
 
-    #         image[x, y, z] = 210
+def selectMarkers(img, hexaGrid, color=[86, 76, 115]):
+    # calcule tous les minimas locaux
+    localMinimas = computeLocalMinimas(img, hexaGrid)
 
-    #     plt.imshow(np.array(cv2.cvtColor(image.astype(
-    #         np.float32), cv2.COLOR_BGR2RGB), np.uint8))
+    # prune local minimas
+    # for each cell get the list of components
+    for components in localMinimas:
 
-    #     plt.show()
+        print("new cell")
+        for component in components:
 
-    print(regionprops(labeled).shape)
-
-    return image
+            print(np.array(component).shape)

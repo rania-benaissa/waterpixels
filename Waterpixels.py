@@ -38,12 +38,8 @@ plt.show()
 # compute minima
 
 
-markers_img = computeMinima(gradient, hexaGrid)
+selectMarkers(gradient, hexaGrid)
 #markers_img = hexaGrid.drawHexaGrid(markers_img)
-
-plt.imshow(np.array(cv2.cvtColor(markers_img.astype(
-    np.float32), cv2.COLOR_BGR2RGB), np.uint8))
-plt.show()
 
 
 # imageCells = voronoiTesselation(gray_img.shape, centers, sigma)
