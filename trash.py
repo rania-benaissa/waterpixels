@@ -46,3 +46,18 @@
 #     plt.show()
 
 # print(regionprops(labeled).shape)
+
+import numpy as np
+from itertools import product
+b = np.array([[1, 2], [3, 4]])
+
+
+indices = list(product(np.arange(b.shape[0]), np.arange(b.shape[1])))
+
+indices2 = list(product(np.arange(b.shape[0]+1), np.arange(b.shape[1]+1)))
+
+print(list(indices))
+
+print(list(indices2))
+
+print(list(np.setdiff1d(indices2, indices)))

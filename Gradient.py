@@ -1,5 +1,6 @@
+from msilib.schema import Component
 from os import stat
-from matplotlib import patches
+from matplotlib import markers, patches
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
@@ -51,28 +52,35 @@ def morphologicalGradient(image):
     return cv2.dilate(img, struct_elt) - cv2.erode(img, struct_elt)
 
 
-def computeLocalMinimas(img, hexaGrid, color=[86, 76, 115]):
-    #image = np.full((img.shape[0], img.shape[1], 3), 0)
+def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
 
-    # connected component of all cells
-    cellsComps = []
+    # markers of all cells
+    markers = []
+
+    markers_centers = []
+
+    minimas_image = np.full((img.shape[0], img.shape[1], 3), 0, dtype=np.uint8)
+    markers_image = np.full((img.shape[0], img.shape[1], 3), 0, dtype=np.uint8)
 
     for center in hexaGrid.centers:
-
-        binary_image = np.full((img.shape), 0, dtype=np.uint8)
+        # binary image that will contain minimas of a cell
+        cell_minimas_image = np.full((img.shape), 0, dtype=np.uint8)
 
         vertices = np.int32(hexaGrid.getHomoHexaVertices(
             center))
 
-        # connected component of a cell
-        cellComponents = []
-
         # create mask for my polygon
         mask = np.zeros_like(img)
         cv2.fillPoly(mask, [vertices], (255))
+        # plt.imshow(mask)
+        # plt.show()
 
         # get the indices inside the poly
         hex_indices = np.where(mask == 255)
+
+        selected_marker = []
+
+        #selected_center = []
 
         # this condition treats borders
         if(hex_indices[0] != [] and hex_indices[1] != []):
@@ -84,30 +92,50 @@ def computeLocalMinimas(img, hexaGrid, color=[86, 76, 115]):
             # image[hex_indices[0][indices], hex_indices[1]
             #       [indices]] = color[::-1]
 
-            binary_image[hex_indices[0][indices], hex_indices[1]
-                         [indices]] = 255
+            cell_minimas_image[hex_indices[0][indices], hex_indices[1]
+                               [indices]] = 255
 
-            numLabels, labels, _, _ = cv2.connectedComponentsWithStats(
-                binary_image, connectivity=8)
+            # i'll save the image containing all the minimas
+
+            minimas_image[hex_indices[0][indices], hex_indices[1]
+                          [indices]] = color
+
+            numLabels, labels, _, centers = cv2.connectedComponentsWithStats(
+                cell_minimas_image, connectivity=8)
+
+            # plt.imshow(labels)
+            # plt.show()
+
+            nb_pixels = 0
+
+            # i select as a marker the biggest connected component
 
             for i in range(1, numLabels):
 
-                cellComponents.append(np.argwhere(labels == i))
+                new_marker = np.argwhere(labels == i)
 
-        cellsComps.append(np.array(cellComponents))
+                if(nb_pixels < new_marker.shape[0]):
+                    #selected_center = centers[i]
+                    nb_pixels = new_marker.shape[0]
+                    selected_marker = new_marker
 
-    return cellsComps
+        markers.append(selected_marker)
+        # markers_centers.append(selected_center)
 
+    for marker in markers:
 
-def selectMarkers(img, hexaGrid, color=[86, 76, 115]):
-    # calcule tous les minimas locaux
-    localMinimas = computeLocalMinimas(img, hexaGrid)
+        for point in marker:
+            # image containing only the selected markers
+            markers_image[point[0], point[1]] = color
 
-    # prune local minimas
-    # for each cell get the list of components
-    for components in localMinimas:
+    cv2.imwrite("image_minimas.jpg", minimas_image)
 
-        print("new cell")
-        for component in components:
+    cv2.imwrite("image_markers.jpg", markers_image)
 
-            print(np.array(component).shape)
+    cv2.imwrite("image_minimas_with_grid.jpg",
+                hexaGrid.drawHexaGrid(minimas_image))
+
+    cv2.imwrite("image_markers_with_grid.jpg",
+                hexaGrid.drawHexaGrid(markers_image))
+
+    return markers  # , markers_centers

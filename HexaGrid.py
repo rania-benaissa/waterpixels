@@ -6,7 +6,7 @@ import cv2
 
 class HexaGrid():
 
-    def __init__(self, sigma, rho, color=[93, 131, 155], thickness=1):
+    def __init__(self, sigma, rho, color=[49, 73, 97], thickness=1):
         """Constructor
 
         Parameters
@@ -116,7 +116,7 @@ class HexaGrid():
 
         Returns:
         ----------
-        points : list of vertices positions.
+        points : list of vertices positions after homothety.
 
         """
 
@@ -149,8 +149,6 @@ class HexaGrid():
 
             center : the center of the hexagon.
 
-            size : radius of the hexagon (distance between every vertex and its center).
-
         Returns:
         ----------
         bool : True, if the hexagon is inside the image, False otherwise.
@@ -178,39 +176,34 @@ class HexaGrid():
         ----------
             image : image with an hexagonal grid
 
-            centers : hexagon's centers.
-
-            rho : homothety factor [0,1].
-
         Returns:
         ----------
-        image : the image with a modified grid.
+        image : the image with modified grid.
 
         """
+
         image = img.copy()
 
-        new_vertices = []
+        mask = np.full((img.shape[0], img.shape[1]), 255)
 
         for center in self.centers:
             # inversed centers so that it can be drawn
-            vertices = self.getHexaVertices(center[::-1])
+            vertices = np.int32(self.getHomoHexaVertices(
+                center))
 
-            new_vertices = []
+            # create mask for my polygon
 
-            for v in vertices:
+            cv2.fillPoly(mask, [vertices], (0))
 
-                x, y = v
-                # just inversed the positions so that it can be drawn
-                new_x = int(self.rho * (x-center[1]) + center[1])
-                new_y = int(self.rho * (y-center[0]) + center[0])
+            # get the indices inside the poly
+        grid_indices = np.where(mask == 255)
 
-                image = cv2.line(
-                    image, [new_x, new_y], v, self.color, self.thickness, cv2.LINE_AA)
+        if(len(image.shape) == 3):
 
-                new_vertices.append([new_x, new_y])
+            image[grid_indices] = self.color
+        else:
 
-            cv2.fillPoly(image, np.int32(
-                [[new_vertices], [vertices]]), self.color)
+            image[grid_indices] = np.mean(self.color)
 
         return image
 
@@ -278,6 +271,8 @@ class HexaGrid():
 
         """
 
+        # this is temporary
+        grid_image = np.full((img.shape[0], img.shape[1], 3), 0)
         image = img.copy()
 
         for center in self.centers:
@@ -286,16 +281,20 @@ class HexaGrid():
             # meanwhile i m workin with h * w
             image = self.drawHexa(image, center[::-1])
 
+            grid_image = self.drawHexa(grid_image, center[::-1])
+
             # cv2.circle(image, (int(center[1]), int(
             #     center[0])), 0, color, 3)
 
             # plt.imshow(image, cmap="gray")
             # plt.show()
 
-        cv2.imwrite("grid_image.jpg", image)
+        cv2.imwrite("grid.jpg", grid_image)
         # homothety operation
         image = self.addMargin(image)
 
-        cv2.imwrite("grid_image_with_margin.jpg", image)
+        grid_image = self.addMargin(grid_image)
+
+        cv2.imwrite("grid_with_margin.jpg", grid_image)
 
         return image
