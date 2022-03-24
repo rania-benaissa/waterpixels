@@ -46,18 +46,21 @@ def voronoiTesselation(shape, markers, sigma, color=[249, 217, 38][::-1]):
 
     gray_diagram = (2/sigma)*gray_diagram
 
-    diagram[:, :, 0] = gray_diagram
+    vis_gray_diagram = cv2.normalize(
+        (2/sigma)*gray_diagram,  None, 0, 255, cv2.NORM_MINMAX)
 
-    diagram[:, :, 1] = gray_diagram
+    diagram[:, :, 0] = vis_gray_diagram
 
-    diagram[:, :, 2] = gray_diagram
+    diagram[:, :, 1] = vis_gray_diagram
+
+    diagram[:, :, 2] = vis_gray_diagram
 
     for point in markers_points:
         # image containing only the selected markers
         diagram[point[0], point[1]] = color
 
     cv2.imwrite("voronoi.jpg",
-                gray_diagram)
+                vis_gray_diagram)
 
     cv2.imwrite("voronoi_with_markers.jpg",
                 diagram)
