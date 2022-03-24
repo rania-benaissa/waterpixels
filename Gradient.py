@@ -34,8 +34,15 @@ def SobelOperator(img, sigma=None):
     g_x = signal.convolve2d(image, s_x, mode='same')
 
     g_y = signal.convolve2d(image, s_y, mode='same')
+
+    # print(g_y)
     # magnitude
-    return np.sqrt(np.power(g_x, 2) + np.power(g_y, 2))
+    norm = np.sqrt(np.power(g_x, 2) + np.power(g_y, 2))
+
+    normalized_norm = cv2.normalize(
+        norm,  None, 0, 255, cv2.NORM_MINMAX)
+
+    return normalized_norm
 
 
 # only gray lvl
@@ -47,7 +54,7 @@ def morphologicalGradient(image):
 
     img = image.copy()
 
-    struct_elt = np.ones((4, 4), np.uint8)
+    struct_elt = np.ones((3, 3), np.uint8)
 
     return cv2.dilate(img, struct_elt) - cv2.erode(img, struct_elt)
 

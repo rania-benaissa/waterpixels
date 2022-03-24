@@ -1,3 +1,4 @@
+from matplotlib.pyplot import gray
 import numpy as np
 import cv2
 from itertools import product
@@ -13,6 +14,8 @@ def euclidianDist(row, markers_centers):
 
     # je get les pixels sur les lignes
     row_indices = list(product([euclidianDist.i], np.arange(len(row))))
+
+    # print(row_indices)
 
     euclidianDist.i += 1
 
@@ -41,8 +44,7 @@ def voronoiTesselation(shape, markers, sigma, color=[249, 217, 38][::-1]):
     gray_diagram = np.apply_along_axis(
         euclidianDist, 1, gray_diagram, markers_points)
 
-    gray_diagram = cv2.normalize(
-        (2/sigma)*gray_diagram,  None, 0, 255, cv2.NORM_MINMAX)
+    gray_diagram = (2/sigma)*gray_diagram
 
     diagram[:, :, 0] = gray_diagram
 
