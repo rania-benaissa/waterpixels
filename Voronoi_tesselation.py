@@ -1,4 +1,3 @@
-from matplotlib.pyplot import gray
 import numpy as np
 import cv2
 from itertools import product
@@ -6,8 +5,6 @@ from sklearn.metrics.pairwise import euclidean_distances
 
 
 # it computes that for a row
-
-
 def euclidianDist(row, markers_centers):
 
     # je reecup les indices d'une ligne i
@@ -39,15 +36,19 @@ def voronoiTesselation(shape, markers, sigma, color=[249, 217, 38][::-1]):
             markers_points.append(point)
     # j'applique ma fonction sur chaque ligne
 
-    # print(np.array(markers_points).shape)
-
     gray_diagram = np.apply_along_axis(
         euclidianDist, 1, gray_diagram, markers_points)
 
+    gray_diagram = cv2.normalize(
+        gray_diagram,  None, 0, 255, cv2.NORM_MINMAX)
+
     gray_diagram = (2/sigma)*gray_diagram
 
+    print("Voronoi max = ", gray_diagram.max())
+
+    # juste pour visualiser
     vis_gray_diagram = cv2.normalize(
-        (2/sigma)*gray_diagram,  None, 0, 255, cv2.NORM_MINMAX)
+        gray_diagram,  None, 0, 255, cv2.NORM_MINMAX)
 
     diagram[:, :, 0] = vis_gray_diagram
 

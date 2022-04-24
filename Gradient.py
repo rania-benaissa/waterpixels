@@ -1,41 +1,18 @@
-from msilib.schema import Component
-from os import stat
-from matplotlib import markers, patches
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy import signal
 import cv2
-from skimage.measure import label, regionprops, regionprops_table
-from skimage.color import label2rgb
-
-
-def gaussianKernel(sigma):
-    """ double -> Array
-        return a gaussian kernel of standard deviation sigma
-    """
-    n2 = np.int64(np.ceil(3*sigma))
-    x, y = np.meshgrid(np.arange(-n2, n2+1), np.arange(-n2, n2+1))
-    kern = np.exp(-(x**2+y**2)/(2*sigma*sigma))
-    return kern/kern.sum()
 
 
 def SobelOperator(img, sigma=None):
 
     image = img.copy()
 
-    s_x = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
-
-    s_y = s_x.T
-
     if(sigma != None):
 
-        image = signal.convolve2d(image, gaussianKernel(sigma), mode='same')
+        image = cv2.GaussianBlur(image, (3, 3), sigma, 0)
 
-    g_x = signal.convolve2d(image, s_x, mode='same')
+    g_x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3)
+    g_y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=3)
 
-    g_y = signal.convolve2d(image, s_y, mode='same')
-
-    # print(g_y)
     # magnitude
     norm = np.sqrt(np.power(g_x, 2) + np.power(g_y, 2))
 
@@ -43,7 +20,6 @@ def SobelOperator(img, sigma=None):
         norm,  None, 0, 255, cv2.NORM_MINMAX)
 
     return normalized_norm
-
 
 # only gray lvl
 
@@ -56,7 +32,7 @@ def morphologicalGradient(image):
 
     struct_elt = np.ones((3, 3), np.uint8)
 
-    return cv2.dilate(img, struct_elt) - cv2.erode(img, struct_elt)
+    return cv2.morphologyEx(img, cv2.MORPH_GRADIENT, struct_elt)
 
 
 def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
@@ -87,7 +63,7 @@ def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
 
         selected_marker = []
 
-        #selected_center = []
+        # selected_center = []
 
         # this condition treats borders
         if(hex_indices[0] != [] and hex_indices[1] != []):
@@ -122,7 +98,7 @@ def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
                 new_marker = np.argwhere(labels == i)
 
                 if(nb_pixels < new_marker.shape[0]):
-                    #selected_center = centers[i]
+                    # selected_center = centers[i]
                     nb_pixels = new_marker.shape[0]
                     selected_marker = new_marker
 

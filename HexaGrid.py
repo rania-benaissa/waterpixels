@@ -75,6 +75,8 @@ class HexaGrid():
 
         """
 
+        image = image.astype(np.uint8)
+
         points = self.getHexaVertices(center)
 
         for i in range(6):
@@ -184,7 +186,7 @@ class HexaGrid():
 
         image = img.copy()
 
-        mask = np.full((img.shape[0], img.shape[1]), 255)
+        mask = np.full((img.shape[0], img.shape[1]), 255, np.uint8)
 
         for center in self.centers:
             # inversed centers so that it can be drawn
