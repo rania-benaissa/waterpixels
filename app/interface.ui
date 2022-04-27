@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1800</width>
+    <height>950</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>2</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1800</width>
+    <height>950</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1800</width>
+    <height>950</height>
+   </size>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <family>Arial</family>
+    <pointsize>15</pointsize>
+    <weight>50</weight>
+    <bold>false</bold>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Application</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonIconOnly</enum>
+  </property>
+  <property name="documentMode">
+   <bool>false</bool>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <widget class="QPushButton" name="browserButton">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>860</y>
+      <width>331</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="text">
+     <string>Load an image</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="title">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>1791</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>26</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Waterpixels</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="load_other_img">
+    <property name="geometry">
+     <rect>
+      <x>1300</x>
+      <y>870</y>
+      <width>331</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Load another image</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="parameters">
+    <property name="geometry">
+     <rect>
+      <x>1130</x>
+      <y>140</y>
+      <width>651</width>
+      <height>681</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Parameters</string>
+    </property>
+    <widget class="QSlider" name="grid_slider">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>90</y>
+       <width>261</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>90</y>
+       <width>251</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Grid step</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>160</y>
+       <width>251</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Padding (rho)</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="rho_slider">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>160</y>
+       <width>261</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="k_slider">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>630</y>
+       <width>261</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>630</y>
+       <width>271</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Regularization factor K</string>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>230</y>
+       <width>601</width>
+       <height>381</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Gradient</string>
+     </property>
+     <widget class="QRadioButton" name="sobel_radio">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>70</y>
+        <width>371</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Sobel operator</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="morpho_radio">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>220</y>
+        <width>371</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Morphological gradient</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="loaded_img">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>150</y>
+      <width>931</width>
+      <height>671</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>No image loaded</string>
+    </property>
+   </widget>
+   <zorder>title</zorder>
+   <zorder>load_other_img</zorder>
+   <zorder>browserButton</zorder>
+   <zorder>parameters</zorder>
+   <zorder>loaded_img</zorder>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

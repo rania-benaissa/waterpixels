@@ -26,11 +26,22 @@ def SobelOperator(img, sigma=None):
 # a morphological gradient is the difference between the dilation and the erosion of a given image.
 
 
-def morphologicalGradient(image):
+def morphologicalGradient(image, value):
 
     img = image.copy()
 
-    struct_elt = np.ones((3, 3), np.uint8)
+    if(value == -1):
+
+        print("Rect")
+        struct_elt = cv2.getStructuringElement(cv2.MORPH_RECT, (4, 4))
+
+    if(value == -2):
+        print("Ellipse")
+        struct_elt = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
+
+    if(value == -3):
+        print("Cross")
+        struct_elt = cv2.getStructuringElement(cv2.MORPH_CROSS, (4, 4))
 
     return cv2.morphologyEx(img, cv2.MORPH_GRADIENT, struct_elt)
 

@@ -291,12 +291,12 @@ class HexaGrid():
             # plt.imshow(image, cmap="gray")
             # plt.show()
 
-        cv2.imwrite("grid.jpg", grid_image)
+        #cv2.imwrite("grid.jpg", grid_image)
         # homothety operation
         image = self.addMargin(image)
 
         grid_image = self.addMargin(grid_image)
 
-        cv2.imwrite("grid_with_margin.jpg", grid_image)
+        #cv2.imwrite("grid_with_margin.jpg", grid_image)
 
         return image

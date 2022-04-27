@@ -5,6 +5,7 @@ from HexaGrid import HexaGrid
 from Voronoi_tesselation import voronoiTesselation
 from skimage.segmentation import watershed
 import numpy as np
+from matplotlib import pyplot as plt
 
 
 count = 0
@@ -20,16 +21,13 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2/3, k=8):
     img = cv2.imread(path)
 
     t = TicToc()
+    t.tic()
 
     if(img is not None):
-
-        t.tic()
 
         hexaGrid = HexaGrid(sigma, rho)
 
         hexaGrid.computeCenters(img.shape)
-
-        t.toc("Hexa grid init")
 
         # conversion to gray scale images
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -42,33 +40,22 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2/3, k=8):
 
             #cv2.imwrite("image_morpho_gradient"+str(count)+".jpg", gradient)
         else:
-            t.tic()
+
             # # # computing a Sobel operator gradient
             gradient = SobelOperator(gray_img, g_sigma)
 
-            t.toc("gradient computation")
-
             #cv2.imwrite("image_gradient"+str(count)+".jpg", gradient)
-        t.tic()
-        image_grid = hexaGrid.drawHexaGrid(img)
 
-        t.toc("Hexa grid drawing")
+        image_grid = hexaGrid.drawHexaGrid(img)
 
         #cv2.imwrite("image_grid.jpg", image_grid)
 
         # compute minimas and select markers
-        t.tic()
         markers = selectMarkers(gradient, hexaGrid)
-        t.toc("Compute markers")
-
-        t.tic()
 
         distImage = voronoiTesselation(
             img.shape, markers, sigma)
 
-        t.toc("Compute Veronoi tesselations")
-
-        t.tic()
         g_reg = gradient + k * (distImage)
 
         cv2.imwrite("regularized_gradient"+str(count)+".jpg", g_reg)
@@ -79,13 +66,7 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2/3, k=8):
             for point in marker:
                 markers_map[point[0], point[1]] = i+1
 
-        t.toc("Regu gradient")
-        t.tic()
         labels = watershed(g_reg, markers_map, watershed_line=True)
-
-        t.toc("watershed transform")
-
-        t.tic()
 
         indices = np.where(labels == 0)
 
@@ -94,19 +75,60 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2/3, k=8):
             cv2.circle(img, np.int32([indices[1][i], indices[0][i]]),
                        1, [249, 217, 38][::-1], -1, cv2.LINE_AA)
 
-        t.toc("drawing waterpixels")
-
         #cv2.imwrite("waterpixels"+str(count)+".jpg", img)
 
+    t.toc()
     return img
+
 
     # parameters
 sigma = 35
 # rho ne doit pas etre egale a 0 control that !
 rho = 2/3
 
-k = 8
+k = 4
 
-path = "images/image8.jpg"
+fig, axs = plt.subplots(2, 4)
 
-waterPixels(path, 0.7, sigma, rho, k)
+g_sigma = [0.4, 0.7, 1.0]
+
+path = "images/image5.jpg"
+
+im = cv2.imread(path)
+
+axs[0, 0].imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
+axs[0, 0].set_title("Original image")
+axs[0, 0].axis('off')
+
+
+axs[1, 0].imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
+axs[1, 0].set_title("Original image")
+axs[1, 0].axis('off')
+
+type = ["Cross", "Ellipse", "Rect"]
+for i in range(len(g_sigma)):
+
+    im = waterPixels(path, g_sigma[i], sigma, rho, k)
+
+    # showing image
+    axs[0, i+1].imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
+    axs[0, i+1].set_title(
+        "Sobel with sigma = "+str(g_sigma[i]))
+    axs[0, i+1].axis('off')
+
+    # partie gradient morpho
+    im = waterPixels(path, -1-i, sigma, rho, k)
+
+    # showing image
+    axs[1, i+1].imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
+    axs[1, i + 1].set_title("Morphological gradient with " +
+                            type[-1-i] + " kernel")
+    axs[1, i+1].axis('off')
+# sobel
+# waterPixels("images/image5.jpg", True, sigma, rho, k)
+
+# waterPixels("images/image5.jpg", False, sigma, rho, k)
+
+fig.tight_layout()
+plt.show()
+fig.savefig('sobel_morph.jpg', bbox_inches='tight')
