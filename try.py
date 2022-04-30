@@ -1,11 +1,13 @@
+from fastdist import fastdist
 import numpy as np
-from scipy.spatial.distance import cdist
+from pytictoc import TicToc
+a = np.random.rand(154401, 2)
+b = np.random.rand(6317, 2)
 
-x = np.array([[2, 1], [2, 1]])
-y = np.array([[1, 0], [2, 3], [4, 3]])
 
+t = TicToc()
+t.tic()
+fastdist.matrix_to_matrix_distance(b, a, fastdist.jaccard, "jaccard")
 
-print(np.array(x).shape)
-print(np.array(y).shape)
-d = cdist(x, y, 'euclidean')
-print(d)
+t.toc()
+# returns an array of shape (25, 50)
