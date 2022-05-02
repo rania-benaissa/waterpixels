@@ -45,6 +45,7 @@ def plot(x, y, title=None):
 
     if(title is not None):
         plt.title(title)
+
     plt.savefig('br.jpg', bbox_inches='tight')
     plt.show()
 
@@ -121,7 +122,6 @@ def waterPixels(img, g_sigma=0, sigma=40, rho=2/3, k=8):
 
     return img, contours, len(hexaGrid.centers)
 
-
     # parameters
 sigmas = np.arange(10, 50, 5)
 
@@ -132,6 +132,9 @@ k = 8
 
 images, gt_contours = load_BSDS(
     "../BSD500/images/test/", "../BSD500/ground_truth/test/")
+
+
+images = images[:2]
 # print(len(images))
 x = np.zeros(len(sigmas))
 y = np.zeros(len(sigmas))

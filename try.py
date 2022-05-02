@@ -1,13 +1,14 @@
-from fastdist import fastdist
+from scipy.spatial.distance import cdist
 import numpy as np
 from pytictoc import TicToc
-a = np.random.rand(154401, 2)
+a = np.random.rand(1, 2)
+print(a)
 b = np.random.rand(6317, 2)
 
 
 t = TicToc()
 t.tic()
-fastdist.matrix_to_matrix_distance(b, a, fastdist.jaccard, "jaccard")
-
+dist = cdist(a, b, "cityblock")
+print(dist.shape)
 t.toc()
 # returns an array of shape (25, 50)
