@@ -77,7 +77,7 @@ def voronoiTesselation(shape, markers, sigma, distType='euclidean', color=[249, 
     # cv2.imwrite("voronoi.jpg",
     #             vis_gray_diagram)
 
-    cv2.imwrite("voronoi_with_markers.jpg",
-                diagram)
+    # cv2.imwrite("voronoi_with_markers.jpg",
+    #             diagram)
 
     return gray_diagram, diagram

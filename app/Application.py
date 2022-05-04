@@ -1,7 +1,5 @@
 import sys
-import cv2
 
-import numpy as np
 import qdarkstyle
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import *
@@ -36,6 +34,12 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.loaded_img.setVisible(False)
         self.ui.load_other_img.setVisible(False)
 
+        self.ui.grid_view.setText(str(self.ui.grid_slider.value()))
+        self.ui.rho_view.setText(str(self.ui.rho_slider.value()/100))
+        self.ui.k_view.setText(str(self.ui.k_slider.value()))
+
+        self.ui.visu.setVisible(False)
+        self.ui.apply_waterpixels.setEnabled(False)
         self.url = ""
 
         ###### SLOTS and calls ######
@@ -43,6 +47,13 @@ class mywindow(QtWidgets.QMainWindow):
         # menu principal
         self.ui.browserButton.clicked.connect(self.browseImage)
         self.ui.load_other_img.clicked.connect(self.browseImage)
+
+        self.ui.grid_slider.valueChanged.connect(
+            lambda value: self.updateSlider(value, 1))
+        self.ui.rho_slider.valueChanged.connect(
+            lambda value: self.updateSlider(value, 2))
+        self.ui.k_slider.valueChanged.connect(
+            lambda value: self.updateSlider(value, 3))
 
     def browseImage(self):
 
@@ -54,18 +65,35 @@ class mywindow(QtWidgets.QMainWindow):
 
         # if i selected an image gotta choose the recognition sys
         if(self.url != ""):
+
             self.image = io.imread(self.url)
 
             self.ui.loaded_img.setVisible(True)
             self.ui.browserButton.setVisible(False)
             self.ui.load_other_img.setVisible(True)
+            self.ui.apply_waterpixels.setEnabled(True)
 
+            h = self.ui.loaded_img.height()
+
+            w = self.ui.loaded_img.width()
             # affiche l image
-            self.ui.loaded_img.setPixmap(QPixmap(self.url))
+            pixmap = QPixmap(self.url)
+            self.ui.loaded_img.setPixmap(
+                pixmap.scaled(w, h, QtCore.Qt.KeepAspectRatio))
 
         else:
             pass
-            # show a message
+
+    def updateSlider(self, value, choice):
+
+        if(choice == 1):
+            self.ui.grid_view.setText(str(value))
+
+        if(choice == 2):
+            self.ui.rho_view.setText(str(float(value/100)))
+
+        if(choice == 3):
+            self.ui.k_view.setText(str(value))
 
 
 # APP Starting

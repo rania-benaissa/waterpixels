@@ -122,14 +122,14 @@ def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
             # image containing only the selected markers
             markers_image[point[0], point[1]] = color
 
-    cv2.imwrite("image_minimas.jpg", minimas_image)
+    #cv2.imwrite("image_minimas.jpg", minimas_image)
 
-    cv2.imwrite("image_markers.jpg", markers_image)
+    # cv2.imwrite("image_markers.jpg", markers_image)
 
-    cv2.imwrite("image_minimas_with_grid.jpg",
-                hexaGrid.drawHexaGrid(minimas_image))
+    # cv2.imwrite("image_minimas_with_grid.jpg",
+    #             hexaGrid.drawHexaGrid(minimas_image))
 
-    cv2.imwrite("image_markers_with_grid.jpg",
-                hexaGrid.drawHexaGrid(markers_image))
+    # cv2.imwrite("image_markers_with_grid.jpg",
+    #             hexaGrid.drawHexaGrid(markers_image))
 
     return markers  # , markers_centers
