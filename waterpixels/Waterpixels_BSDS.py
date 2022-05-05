@@ -8,10 +8,7 @@ from Voronoi_tesselation import voronoiTesselation
 from skimage.segmentation import watershed
 import numpy as np
 from matplotlib import pyplot as plt
-from skimage.segmentation import find_boundaries, mark_boundaries
-from skimage.segmentation import felzenszwalb, slic
-from skimage.morphology import binary_erosion, binary_dilation
-from skimage.measure import find_contours
+from skimage.segmentation import slic
 
 
 def labelsToContours(labels, image=None):
@@ -210,7 +207,6 @@ def waterPixels(img, g_sigma=0, sigma=40, rho=2/3, k=8):
         # cv2.imwrite("waterpixels.jpg", img)
 
     return img, contours, len(hexaGrid.centers)
-
 
     # parameters
 steps = np.arange(10, 50, 5)

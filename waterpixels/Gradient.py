@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 
 
-def SobelOperator(img, sigma=None):
+def sobelOperator(img, sigma=None):
 
     image = img.copy()
 
