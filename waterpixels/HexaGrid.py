@@ -82,7 +82,7 @@ class HexaGrid():
         for i in range(6):
 
             image = cv2.line(
-                image, points[i-1], points[i], self.color, self.thickness, cv2.LINE_AA)
+                image, points[i - 1], points[i], self.color, self.thickness, cv2.LINE_AA)
 
         return image
 
@@ -133,8 +133,8 @@ class HexaGrid():
 
             x, y = v
             # just inversed the positions so that it can be drawn
-            new_x = int(self.rho * (x-center[1]) + center[1])
-            new_y = int(self.rho * (y-center[0]) + center[0])
+            new_x = int(self.rho * (x - center[1]) + center[1])
+            new_y = int(self.rho * (y - center[0]) + center[0])
 
             new_vertices.append([new_x, new_y])
 
@@ -166,7 +166,7 @@ class HexaGrid():
 
             x, y = point
 
-            if(x >= 0 and x+epsilon <= h and y >= 0 and y+epsilon <= w):
+            if(x >= 0 and x + epsilon <= h and y >= 0 and y + epsilon <= w):
 
                 return True
         return False
@@ -245,7 +245,7 @@ class HexaGrid():
 
                 center = [center[0] + self.sigma, center[1]]
 
-            center = [change*self.sigma/2, center[1] + (3/2)*self.size]
+            center = [change * self.sigma / 2, center[1] + (3 / 2) * self.size]
 
             if(change == 0):
 
@@ -255,7 +255,7 @@ class HexaGrid():
 
                 change = 0
 
-        print("nb centers ", len(centers))
+        #print("nb centers ", len(centers))
 
         self.centers = centers
 

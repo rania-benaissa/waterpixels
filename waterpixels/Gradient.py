@@ -2,22 +2,22 @@ import numpy as np
 import cv2
 
 
-def sobelOperator(img, sigma=None):
+def sobelOperator(img, sigma=0, size=3):
 
     image = img.copy()
 
-    if(sigma != None):
+    if(sigma != 0):
 
-        image = cv2.GaussianBlur(image, (3, 3), sigma, 0)
+        image = cv2.GaussianBlur(image, (size, size), sigma, 0)
 
-    g_x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3)
-    g_y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=3)
+    g_x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=size)
+    g_y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=size)
 
     # magnitude
     norm = np.sqrt(np.power(g_x, 2) + np.power(g_y, 2))
 
     normalized_norm = cv2.normalize(
-        norm,  None, 0, 255, cv2.NORM_MINMAX)
+        norm, None, 0, 255, cv2.NORM_MINMAX)
 
     return normalized_norm
 
@@ -51,14 +51,14 @@ def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
     # markers of all cells
     markers = []
 
-    markers_centers = []
+    #markers_centers = []
 
-    minimas_image = np.full((img.shape[0], img.shape[1], 3), 0, dtype=np.uint8)
-    markers_image = np.full((img.shape[0], img.shape[1], 3), 0, dtype=np.uint8)
+    minimas_image = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
+    markers_image = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
 
     for center in hexaGrid.centers:
         # binary image that will contain minimas of a cell
-        cell_minimas_image = np.full((img.shape), 0, dtype=np.uint8)
+        cell_minimas_image = np.zeros((img.shape), dtype=np.uint8)
 
         vertices = np.int32(hexaGrid.getHomoHexaVertices(
             center))
@@ -94,7 +94,7 @@ def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
             minimas_image[hex_indices[0][indices], hex_indices[1]
                           [indices]] = color
 
-            numLabels, labels, _, centers = cv2.connectedComponentsWithStats(
+            numLabels, labels = cv2.connectedComponents(
                 cell_minimas_image, connectivity=8)
 
             # plt.imshow(labels)
@@ -116,13 +116,13 @@ def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
         markers.append(selected_marker)
         # markers_centers.append(selected_center)
 
-    for marker in markers:
+    # for marker in markers:
 
-        for point in marker:
-            # image containing only the selected markers
-            markers_image[point[0], point[1]] = color
+    #     for point in marker:
+    #         # image containing only the selected markers
+    #         markers_image[point[0], point[1]] = color
 
-    #cv2.imwrite("image_minimas.jpg", minimas_image)
+    # cv2.imwrite("image_minimas.jpg", minimas_image)
 
     # cv2.imwrite("image_markers.jpg", markers_image)
 

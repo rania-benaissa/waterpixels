@@ -8,9 +8,37 @@ from Voronoi_tesselation import voronoiTesselation
 from skimage.segmentation import watershed
 import numpy as np
 from matplotlib import pyplot as plt
-from skimage.segmentation import find_boundaries, mark_boundaries
-from skimage.segmentation import felzenszwalb, slic
-from skimage.morphology import binary_erosion
+from skimage.segmentation import slic
+
+
+def labelsToContours(labels, image=None):
+
+    nb_labels = np.unique(labels)
+    contours = []
+
+    for label in nb_labels:
+
+        y = labels == label
+
+        y = y.astype('uint8')
+        y = morphologicalGradient(y, -3, size=2)
+
+        y = np.array(np.where(y == True)).T
+
+        contours += [c for c in y]
+
+    # this is to get unique contours
+    contours = list(set(map(tuple, contours)))
+    mask = None
+    if(image is not None):
+
+        mask = np.zeros(image.shape, np.uint8)
+        for point in np.array(contours):
+            x, y = point
+            mask[x, y] = 255
+
+    # print(np.array(contours).shape)
+    return np.array(contours).T, mask
 
 
 def load_BSDS(images_folder, ground_folder):
@@ -21,7 +49,7 @@ def load_BSDS(images_folder, ground_folder):
     for filename in os.listdir(images_folder):
 
         # correspondant ground truth filename
-        gFilename = filename[:-3]+"mat"
+        gFilename = filename[:-3] + "mat"
 
         img = cv2.imread(os.path.join(images_folder, filename))
 
@@ -70,7 +98,7 @@ def plotBR(x_wp, br_wp, x_slic, br_slic, title=None):
         plt.title(title)
 
     plt.legend()
-    plt.savefig('br.jpg', bbox_inches='tight')
+    plt.savefig('BSDS_br.jpg', bbox_inches='tight')
     plt.show()
 
 
@@ -104,7 +132,7 @@ def plotBR2(x_wp, y_wp, x_slic, y_slic, title=None):
         plt.title(title)
 
     plt.legend()
-    plt.savefig('br2.jpg', bbox_inches='tight')
+    plt.savefig('BSDS_br2.jpg', bbox_inches='tight')
     plt.show()
 
 
@@ -128,7 +156,7 @@ def boundaryRecall(contours, gt_contours, min_dist=3):
     return cpt / len(gt_contours)
 
 
-def waterPixels(img, g_sigma=0, sigma=40, rho=2/3, k=8):
+def waterPixels(img, g_sigma=0, sigma=40, rho=2 / 3, k=8):
 
     if(img is not None):
 
@@ -142,7 +170,7 @@ def waterPixels(img, g_sigma=0, sigma=40, rho=2/3, k=8):
         # cv2.imwrite("image_gray"+str(count)+".jpg", gray_img)
 
         # # # computing a Sobel operator gradient
-        gradient = SobelOperator(gray_img, g_sigma)
+        gradient = sobelOperator(gray_img, g_sigma)
 
         # cv2.imwrite("image_gradient"+str(count)+".jpg", gradient)
 
@@ -165,7 +193,7 @@ def waterPixels(img, g_sigma=0, sigma=40, rho=2/3, k=8):
 
         for i, marker in enumerate(markers):
             for point in marker:
-                markers_map[point[0], point[1]] = i+1
+                markers_map[point[0], point[1]] = i + 1
 
         labels = watershed(g_reg, markers_map, watershed_line=True)
 
@@ -180,12 +208,11 @@ def waterPixels(img, g_sigma=0, sigma=40, rho=2/3, k=8):
 
     return img, contours, len(hexaGrid.centers)
 
-
     # parameters
-steps = np.arange(45, 50, 5)
+steps = np.arange(10, 50, 5)
 
 # rho ne doit pas etre egale a 0 control that !
-rho = 2/3
+rho = 2 / 3
 
 reg_params = [0, 4, 8, 16]
 
@@ -202,7 +229,7 @@ br_wp = np.zeros((4, len(steps)))
 br_slic = np.zeros(len(steps))
 
 
-sigma = 0.5
+sigma = 1
 
 for j in range(len(steps)):
 
@@ -220,7 +247,7 @@ for j in range(len(steps)):
             br_wp[k][j] += boundaryRecall(contours, gt_contours[i])
 
             cd_wp[k][j] += np.array(contours).shape[1] / \
-                (image.shape[0]*image.shape[1])
+                (image.shape[0] * image.shape[1])
 
             # mask_contours = np.zeros(image.shape, np.uint8)
             # mask_contours[contours] = 255
@@ -231,31 +258,23 @@ for j in range(len(steps)):
         sp_slic = slic(image, n_segments=nbCenters, slic_zero=True, sigma=sigma,
                        start_label=1)
 
-        slic_contours = find_boundaries(sp_slic, mode='outer')
-
-        plt.imshow(slic_contours)
-
-        plt.show()
-
-        slic_contours = np.where(slic_contours == True)
-
-        print(np.array(slic_contours).shape)
+        slic_contours, mask_slic = labelsToContours(sp_slic, image)
 
         br_slic[j] += boundaryRecall(slic_contours, gt_contours[i])
         cd_slic[j] += np.array(slic_contours).shape[1] / \
-            (image.shape[0]*image.shape[1])
+            (image.shape[0] * image.shape[1])
 
         print("Slic superpixels ", len(np.unique(sp_slic)))
 
-        mask_gt = np.zeros(image.shape, np.uint8)
+        # mask_gt = np.zeros(image.shape, np.uint8)
 
         # mask_gt[gt_contours[i]] = 255
 
-        # axs[k+1].imshow(mask_gt)
+        # axs[k+1].imshow(mark_boundaries(image, sp_slic))
         # axs[k+1].set_title("Ground truth")
         # axs[k+1].axis('off')
 
-        # axs[k+2].imshow(mark_boundaries(image, sp_slic))
+        # axs[k+2].imshow(mask_slic)
         # axs[k+2].set_title("SLIC contours")
         # axs[k+2].axis('off')
 

@@ -19,7 +19,7 @@ def euclidianDist(row, markers_centers):
 # la je dois retourner une image avec le min d * 2/ sigma
 
 
-def voronoiTesselation(shape, markers, sigma, distType='euclidean', color=[249, 217, 38][::-1]):
+def voronoiTesselation(shape, markers, sigma, distType='euclidean', color=[249, 217, 38][::-1], visu=False):
 
     max_dims = 500
 
@@ -55,24 +55,25 @@ def voronoiTesselation(shape, markers, sigma, distType='euclidean', color=[249, 
         gray_diagram = np.apply_along_axis(
             euclidianDist, 1, gray_diagram, markers_points)
 
-    gray_diagram = cv2.normalize(
-        gray_diagram,  None, 0, 255, cv2.NORM_MINMAX)
+    if(visu):
+        gray_diagram = cv2.normalize(
+            gray_diagram, None, 0, 255, cv2.NORM_MINMAX)
 
-    gray_diagram = (2/sigma)*(gray_diagram)
+        gray_diagram = (2 / sigma) * (gray_diagram)
 
-    # juste pour visualiser
-    vis_gray_diagram = cv2.normalize(
-        gray_diagram,  None, 0, 255, cv2.NORM_MINMAX)
+        # # juste pour visualiser
+        vis_gray_diagram = cv2.normalize(
+            gray_diagram, None, 0, 255, cv2.NORM_MINMAX)
 
-    diagram[:, :, 0] = vis_gray_diagram
+        diagram[:, :, 0] = vis_gray_diagram
 
-    diagram[:, :, 1] = vis_gray_diagram
+        diagram[:, :, 1] = vis_gray_diagram
 
-    diagram[:, :, 2] = vis_gray_diagram
+        diagram[:, :, 2] = vis_gray_diagram
 
-    for point in markers_points:
-        # image containing only the selected markers
-        diagram[point[0], point[1]] = color
+        for point in markers_points:
+            # image containing only the selected markers
+            diagram[point[0], point[1]] = color
 
     # cv2.imwrite("voronoi.jpg",
     #             vis_gray_diagram)

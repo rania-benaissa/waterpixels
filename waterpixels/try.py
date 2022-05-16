@@ -1,19 +1,36 @@
+from dis import dis
 from scipy.spatial.distance import cdist
 import numpy as np
 from pytictoc import TicToc
-a = np.random.rand(1, 2)
-print(a)
-b = np.random.rand(6317, 2)
+from sklearn.metrics import euclidean_distances
+import math
+a = np.random.rand(1000, 2)
+b = np.random.rand(100000, 2)
 
 
 t = TicToc()
 t.tic()
-dist = cdist(a, b, "cityblock")
+dist = cdist(a, b, "euclidean")
+print(dist)
 print(dist.shape)
 t.toc()
-# returns an array of shape (25, 50)
-x = np.array([[1, 2], [45, 2], [5, 2], [1, 2], [5, 2]])
-y = np.flip(x, 1)
 
-print(x.shape)
-print(y)
+from numba import jit
+
+
+@jit(nopython=True)
+def eudis(a, b):
+    x = np.sum(a**2, axis=1)[:, np.newaxis]
+    y = np.sum(b**2, axis=1)
+    xy = np.dot(a, b.T)
+    return np.sqrt(x + y - 2 * xy)
+
+
+t = TicToc()
+t.tic()
+
+dist = eudis(a, b)
+
+print(dist)
+print(dist.shape)
+t.toc()
