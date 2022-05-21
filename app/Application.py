@@ -218,7 +218,7 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.contours = np.where(labels == 0)
 
-        print("done")
+        print("Waterpixels computation ----> complete")
 
         # update app
         self.ui.parameters.setVisible(False)

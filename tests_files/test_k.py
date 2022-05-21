@@ -36,7 +36,7 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2 / 3, k=8, distType='euclidean'
 
         # t.tic()
         # # # computing a Sobel operator gradient
-        gradient = SobelOperator(gray_img, g_sigma)
+        gradient = sobelOperator(gray_img, g_sigma)
 
         #t.toc("gradient computation")
 
