@@ -1,5 +1,10 @@
+from cProfile import label
 import numpy as np
 import cv2
+from pytictoc import TicToc
+from skimage.draw import polygon2mask
+from matplotlib import pyplot as plt
+from numba import jit
 
 
 def sobelOperator(img, sigma=0, size=3):
@@ -26,7 +31,7 @@ def sobelOperator(img, sigma=0, size=3):
 # a morphological gradient is the difference between the dilation and the erosion of a given image.
 
 
-def morphologicalGradient(image, value=-1, size=4):
+def morphologicalGradient(image, value=-1, size=3):
 
     img = image.copy()
 
@@ -36,10 +41,6 @@ def morphologicalGradient(image, value=-1, size=4):
         struct_elt = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))
 
     if(value == -2):
-        # print("Ellipse")
-        struct_elt = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (size, size))
-
-    if(value == -3):
         # print("Cross")
         struct_elt = cv2.getStructuringElement(cv2.MORPH_CROSS, (size, size))
 
@@ -47,6 +48,12 @@ def morphologicalGradient(image, value=-1, size=4):
 
 
 def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
+    # t_poly = 0
+    # t_minimas = 0
+
+    # t_components = 0
+
+    # t_markers = 0
 
     # markers of all cells
     markers = []
@@ -54,9 +61,9 @@ def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
     #markers_centers = []
 
     minimas_image = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
-    markers_image = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
 
     for center in hexaGrid.centers:
+
         # binary image that will contain minimas of a cell
         cell_minimas_image = np.zeros((img.shape), dtype=np.uint8)
 
@@ -65,9 +72,8 @@ def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
 
         # create mask for my polygon
         mask = np.zeros_like(img)
+
         cv2.fillPoly(mask, [vertices], (255))
-        # plt.imshow(mask)
-        # plt.show()
 
         # get the indices inside the poly
         hex_indices = np.where(mask == 255)
@@ -78,43 +84,36 @@ def selectMarkers(img, hexaGrid, color=[249, 217, 38][::-1]):
 
         # this condition treats borders
         if(hex_indices[0] != [] and hex_indices[1] != []):
+
             # get the local minimum
-            mini = np.amin(img[hex_indices])
+            poly_idx = img[hex_indices]
+            mini = np.amin(poly_idx)
 
-            indices = np.where(img[hex_indices] == mini)
-
-            # image[hex_indices[0][indices], hex_indices[1]
-            #       [indices]] = color[::-1]
+            indices = np.where(poly_idx == mini)
 
             cell_minimas_image[hex_indices[0][indices], hex_indices[1]
                                [indices]] = 255
 
             # i'll save the image containing all the minimas
+            # minimas_image[hex_indices[0][indices], hex_indices[1]
+            #               [indices]] = color
 
-            minimas_image[hex_indices[0][indices], hex_indices[1]
-                          [indices]] = color
-
-            numLabels, labels = cv2.connectedComponents(
+            _, labels = cv2.connectedComponents(
                 cell_minimas_image, connectivity=8)
-
-            # plt.imshow(labels)
-            # plt.show()
-
-            nb_pixels = 0
 
             # i select as a marker the biggest connected component
 
-            for i in range(1, numLabels):
+            counts = np.bincount(labels.ravel())
 
-                new_marker = np.argwhere(labels == i)
+            # removing background
+            counts[0] = -1
 
-                if(nb_pixels < new_marker.shape[0]):
-                    # selected_center = centers[i]
-                    nb_pixels = new_marker.shape[0]
-                    selected_marker = new_marker
+            marker_index = np.argmax(counts)
+
+            selected_marker = np.array(np.unravel_index(np.flatnonzero(
+                labels == marker_index), labels.shape)).T
 
         markers.append(selected_marker)
-        # markers_centers.append(selected_center)
 
     # for marker in markers:
 

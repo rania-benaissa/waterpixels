@@ -1,8 +1,10 @@
+import sys
+sys.path.append('../waterpixels/')
 from pytictoc import TicToc
 import cv2
-from Gradient import *
-from HexaGrid import HexaGrid
-from Voronoi_tesselation import voronoiTesselation
+from waterpixels.Gradient import *
+from waterpixels.HexaGrid import HexaGrid
+from waterpixels.Voronoi_tesselation import voronoiTesselation
 from skimage.segmentation import watershed
 import numpy as np
 from matplotlib import pyplot as plt
@@ -11,7 +13,7 @@ from matplotlib import pyplot as plt
 count = 0
 
 
-def waterPixels(path, g_sigma=-1, sigma=40, rho=2/3, k=8):
+def waterPixels(path, g_sigma=-1, sigma=40, rho=2 / 3, k=8):
 
     global count
 
@@ -58,13 +60,13 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2/3, k=8):
 
         g_reg = gradient + k * (distImage)
 
-        cv2.imwrite("regularized_gradient"+str(count)+".jpg", g_reg)
+        cv2.imwrite("regularized_gradient" + str(count) + ".jpg", g_reg)
 
         markers_map = np.zeros_like(g_reg)
 
         for i, marker in enumerate(markers):
             for point in marker:
-                markers_map[point[0], point[1]] = i+1
+                markers_map[point[0], point[1]] = i + 1
 
         labels = watershed(g_reg, markers_map, watershed_line=True)
 
@@ -84,7 +86,7 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2/3, k=8):
     # parameters
 sigma = 35
 # rho ne doit pas etre egale a 0 control that !
-rho = 2/3
+rho = 2 / 3
 
 k = 4
 
@@ -111,19 +113,19 @@ for i in range(len(g_sigma)):
     im = waterPixels(path, g_sigma[i], sigma, rho, k)
 
     # showing image
-    axs[0, i+1].imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
-    axs[0, i+1].set_title(
-        "Sobel with sigma = "+str(g_sigma[i]))
-    axs[0, i+1].axis('off')
+    axs[0, i + 1].imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
+    axs[0, i + 1].set_title(
+        "Sobel with sigma = " + str(g_sigma[i]))
+    axs[0, i + 1].axis('off')
 
     # partie gradient morpho
-    im = waterPixels(path, -1-i, sigma, rho, k)
+    im = waterPixels(path, -1 - i, sigma, rho, k)
 
     # showing image
-    axs[1, i+1].imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
+    axs[1, i + 1].imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
     axs[1, i + 1].set_title("Morphological gradient with " +
-                            type[-1-i] + " kernel")
-    axs[1, i+1].axis('off')
+                            type[-1 - i] + " kernel")
+    axs[1, i + 1].axis('off')
 # sobel
 # waterPixels("images/image5.jpg", True, sigma, rho, k)
 

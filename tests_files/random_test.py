@@ -1,9 +1,11 @@
+import sys
+sys.path.append('../waterpixels/')
 import os
 import cv2
 from scipy import io
-from Gradient import *
-from HexaGrid import HexaGrid
-from Voronoi_tesselation import voronoiTesselation
+from waterpixels.Gradient import *
+from waterpixels.HexaGrid import HexaGrid
+from waterpixels.Voronoi_tesselation import voronoiTesselation
 from skimage.segmentation import watershed
 import numpy as np
 from matplotlib import pyplot as plt
@@ -127,20 +129,32 @@ def plotTime(x_bsds, time_bsds, x_sbd, time_sbd, title=None):
 
 def waterPixels(img, g_sigma=0, sigma=40, rho=2 / 3, k=8):
 
+    t = TicToc()
+
+    t.tic()
     hexaGrid = HexaGrid(sigma, rho)
 
     hexaGrid.computeCenters(img.shape)
+    t.toc("hexa grid")
 
+    hexaGrid.drawHexaGrid(img)
     # conversion to gray scale images
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
+    t.tic()
     # # # computing a Sobel operator gradient
     gradient = sobelOperator(gray_img, g_sigma)
+    t.toc("Sobel")
 
+    t.tic()
     markers = selectMarkers(gradient, hexaGrid)
-
+    t.toc("Markers")
+    t.tic()
     distImage, _ = voronoiTesselation(
-        img.shape, markers, sigma, 'euclidean')
+        img.shape, markers, sigma, 'euclidean', visu=True)
+
+    t.toc("voronoi")
+
+    t.tic()
 
     g_reg = gradient + k * (distImage)
 
@@ -152,56 +166,42 @@ def waterPixels(img, g_sigma=0, sigma=40, rho=2 / 3, k=8):
 
     labels = watershed(g_reg, markers_map, watershed_line=True)
 
+    t.toc("watershed")
+    indices = np.where(labels == 0)
+
+    for i in range(len(indices[0])):
+
+        cv2.circle(img, np.int32([indices[1][i], indices[0][i]]),
+                   1, [249, 217, 38][::-1], -1, cv2.LINE_AA)
+
+    cv2.imwrite("waterpixels.jpg",
+                img)
     return len(hexaGrid.centers)
 
     # parameters
-steps = np.arange(10, 50, 5)
+steps = [30]
 
 # rho ne doit pas etre egale a 0 control that !
 rho = 2 / 3
 
 k = 8
 
-images, _ = load_BSDS(
-    "../BSD500/images/val/", "../BSD500/ground_truth/val/")
+# images, _ = load_BSDS(
+#     "../../BSD500/images/val2/", "../../BSD500/ground_truth/val/")
 
+images = []
 
-images1, _, _ = load_SBD(
-    "../SBD/images/", "../SBD/labels/")
-# print(len(images))
-x_bsds = np.zeros(len(steps))
-x_sbd = np.zeros(len(steps))
-time_bsds = np.zeros(len(steps))
-
-time_sbd = np.zeros(len(steps))
+images.append(cv2.imread("../images/image1.jpg"))
 
 sigma = 1
+
+t = TicToc()
 
 for j in range(len(steps)):
 
     for i in range(len(images)):
-
-        # waterpixels
-        # t = TicToc()
-        # t.tic()
-        # nbCenters = waterPixels(
-        #     images[i], sigma, steps[j], rho, k)
-
-        # time_bsds[j] += t.tocvalue()
-
-        t = TicToc()
         t.tic()
-        nbCenters1 = waterPixels(
-            images1[i], sigma, steps[j], rho, k)
-        print(nbCenters1)
-        time_sbd[j] += t.tocvalue()
+        nbCenters = waterPixels(
+            images[i], sigma, steps[j], rho, k)
 
-    #x_bsds[j] = nbCenters
-    x_sbd[j] = nbCenters1
-
-
-time_bsds /= len(images)
-time_sbd /= len(images)
-
-
-plotTime(x_bsds, time_bsds, x_sbd, time_sbd)
+        t.toc("Waterpixels")

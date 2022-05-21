@@ -1,6 +1,4 @@
 import sys
-
-from sqlalchemy import false
 sys.path.append('../waterpixels/')
 import qdarkstyle
 from PyQt5 import QtCore, QtWidgets
@@ -45,8 +43,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.grid_view.setText(str(self.ui.grid_slider.value()))
         self.ui.rho_view.setText(str(self.ui.rho_slider.value() / 100))
         self.ui.k_view.setText(str(self.ui.k_slider.value()))
-        self.ui.kernel_size_view.setText(
-            str(self.ui.kernel_size_slider.value()))
+
         self.ui.std_view.setText(
             str(self.ui.std_slider.value() / 100))
 
@@ -72,10 +69,8 @@ class mywindow(QtWidgets.QMainWindow):
             lambda value: self.updateSlider(value, 2))
         self.ui.k_slider.valueChanged.connect(
             lambda value: self.updateSlider(value, 3))
-        self.ui.kernel_size_slider.valueChanged.connect(
-            lambda value: self.updateSlider(value, 4))
         self.ui.std_slider.valueChanged.connect(
-            lambda value: self.updateSlider(value, 5))
+            lambda value: self.updateSlider(value, 4))
 
         self.ui.original_img.toggled.connect(lambda: self.showImage())
         self.ui.waterpixels.toggled.connect(self.showWaterpixels)
@@ -168,9 +163,6 @@ class mywindow(QtWidgets.QMainWindow):
             self.ui.k_view.setText(str(value))
 
         if(choice == 4):
-            self.ui.kernel_size_view.setText(str(value))
-
-        if(choice == 5):
             self.ui.std_view.setText(str(float(value / 100)))
 
     def waterpixels(self):
@@ -179,8 +171,6 @@ class mywindow(QtWidgets.QMainWindow):
         k = int(self.ui.k_view.text())
         sigma = int(self.ui.grid_view.text())
         rho = float(self.ui.rho_view.text())
-
-        kernel_size = int(self.ui.kernel_size_view.text())
 
         hexaGrid = HexaGrid(sigma, rho)
 
@@ -192,7 +182,7 @@ class mywindow(QtWidgets.QMainWindow):
         if(self.ui.sobel_radio.isChecked()):
             std = float(self.ui.std_view.text())
 
-            self.gradient = sobelOperator(gray_img, std, kernel_size)
+            self.gradient = sobelOperator(gray_img, std, 3)
 
         else:
 
@@ -202,13 +192,10 @@ class mywindow(QtWidgets.QMainWindow):
             else:
 
                 if(self.ui.cross.isChecked()):
-                    form = -3
-
-                else:
                     form = -2
 
             # computing morphological gradient
-            self.gradient = morphologicalGradient(gray_img, form, kernel_size)
+            self.gradient = morphologicalGradient(gray_img, form, 3)
 
         self.image_grid = hexaGrid.drawHexaGrid(self.image)
 

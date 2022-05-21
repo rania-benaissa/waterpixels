@@ -1,47 +1,16 @@
-from fileinput import filename
+from audioop import avg
 import os
+from re import M
 import cv2
-from Gradient import *
-from HexaGrid import HexaGrid
-from Voronoi_tesselation import voronoiTesselation
+from scipy import io
+from waterpixels.Gradient import *
+from waterpixels.HexaGrid import HexaGrid
+from waterpixels.Voronoi_tesselation import voronoiTesselation
 from skimage.segmentation import watershed
 import numpy as np
 from matplotlib import pyplot as plt
 from skimage.segmentation import slic
 from skimage.measure import regionprops
-
-
-def load_SBD(images_folder, ground_folder, nb_images=100):
-
-    images = []
-
-    gt_contours = []
-
-    gt_masks = []
-
-    files = os.listdir(images_folder)
-
-    for i in range(nb_images):
-
-        filename = files[i]
-
-        # correspondant ground truth filename
-        gFilename = filename[:-3] + "layers.txt"
-
-        img = cv2.imread(os.path.join(images_folder, filename))
-
-        label_img = np.loadtxt(os.path.join(
-            ground_folder, gFilename), np.uint8)
-
-        contours, mask = labelsToContours(label_img, img)
-
-        gt_contours.append(np.array(contours))
-
-        images.append(img)
-
-        gt_masks.append(mask)
-
-    return images, gt_contours, gt_masks
 
 
 def labelsToContours(labels, image=None):
@@ -54,7 +23,7 @@ def labelsToContours(labels, image=None):
         y = labels == label
 
         y = y.astype('uint8')
-        y = morphologicalGradient(y, -3, size=2)
+        y = morphologicalGradient(y, -1, size=2)
 
         y = np.array(np.where(y == True)).T
 
@@ -72,6 +41,33 @@ def labelsToContours(labels, image=None):
 
     # print(np.array(contours).shape)
     return np.array(contours).T, mask
+
+
+def load_BSDS(images_folder, ground_folder):
+    images = []
+
+    gt_contours = []
+
+    for filename in os.listdir(images_folder):
+
+        # correspondant ground truth filename
+        gFilename = filename[:-3] + "mat"
+
+        img = cv2.imread(os.path.join(images_folder, filename))
+
+        data = io.loadmat(os.path.join(ground_folder, gFilename))
+        # loading contours
+        edge_data = data['groundTruth'][0][0][0][0][1]
+
+        # je reecupere les contours
+        gt_contours.append(np.where(edge_data == 1))
+
+        # img[np.where(edge_data == 1)] = [249, 217, 38][::-1]
+
+        images.append(img)
+        # cv2.imwrite("images/"+filename, img)
+
+    return images, gt_contours
 
 
 def plotGR(x_wp, gr_wp, x_slic, gr_slic, title=None):
@@ -104,8 +100,8 @@ def plotGR(x_wp, gr_wp, x_slic, gr_slic, title=None):
         plt.title(title)
 
     plt.legend()
-    plt.savefig('SBD_gr.jpg', bbox_inches='tight')
-    # plt.show()
+    plt.savefig('BSDS_gr.jpg', bbox_inches='tight')
+    plt.show()
 
 
 def SRC(image, label_image):
@@ -118,12 +114,12 @@ def SRC(image, label_image):
 
     for region in regions:
 
-        cc_shape = region.perimeter / region.area
+        cc_shape = (region.perimeter**2) / region.area
         convex_hull = region.image_convex
         # to get convex hull perimeter
         hull_regions = regionprops(np.array(convex_hull, np.uint8))
 
-        cc_convex = hull_regions[0].perimeter / region.area_convex
+        cc_convex = (hull_regions[0].perimeter**2) / region.area_convex
         # regularity criteria btw 0 and 1
 
         if(cc_shape == 0):
@@ -283,12 +279,14 @@ steps = np.arange(10, 50, 5)
 rho = 2 / 3
 
 reg_params = [0, 4, 8, 16]
-images, gt_contours, gt_masks = load_SBD(
-    "../../SBD/images/", "../../SBD/labels/")
 
-
+images, gt_contours = load_BSDS(
+    "../../BSD500/images/val/", "../../BSD500/ground_truth/val/")
+# print(len(images))
 x_wp = np.zeros(len(steps))
 x_slic = np.zeros(len(steps))
+
+
 gr_wp = np.zeros((4, len(steps)))
 gr_slic = np.zeros(len(steps))
 
@@ -299,7 +297,7 @@ for j in range(len(steps)):
 
     for i, image in enumerate(images):
 
-        #fig, axs = plt.subplots(1, 6)
+        # fig, axs = plt.subplots(1, 6)
 
         for k in range(len(reg_params)):
 
@@ -309,7 +307,6 @@ for j in range(len(steps)):
             # print(np.array(contours).shape)
 
             gr_wp[k][j] += globalReg(image, labels, nbCenters)
-
             # mask_contours = np.zeros(image.shape, np.uint8)
             # mask_contours[contours] = 255
             # axs[k].imshow(mask_contours)
@@ -325,7 +322,11 @@ for j in range(len(steps)):
 
         print("Slic superpixels ", len(np.unique(sp_slic)))
 
-        # axs[k+1].imshow(gt_masks[i])
+        # mask_gt = np.zeros(image.shape, np.uint8)
+
+        # mask_gt[gt_contours[i]] = 255
+
+        # axs[k+1].imshow(mark_boundaries(image, sp_slic))
         # axs[k+1].set_title("Ground truth")
         # axs[k+1].axis('off')
 

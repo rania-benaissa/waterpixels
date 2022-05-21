@@ -197,6 +197,9 @@ class HexaGrid():
 
             cv2.fillPoly(mask, [vertices], (0))
 
+            # plt.imshow(mask,cmap="gray")
+            # plt.show()
+
             # get the indices inside the poly
         grid_indices = np.where(mask == 255)
 

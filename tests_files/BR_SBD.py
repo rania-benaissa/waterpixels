@@ -1,14 +1,48 @@
+import sys
+sys.path.append('../waterpixels/')
 import os
 import cv2
-from scipy import io
 from scipy.spatial.distance import cdist
-from Gradient import *
-from HexaGrid import HexaGrid
-from Voronoi_tesselation import voronoiTesselation
+from waterpixels.Gradient import *
+from waterpixels.HexaGrid import HexaGrid
+from waterpixels.Voronoi_tesselation import voronoiTesselation
 from skimage.segmentation import watershed
 import numpy as np
 from matplotlib import pyplot as plt
 from skimage.segmentation import slic
+
+
+def load_SBD(images_folder, ground_folder, nb_images=100):
+
+    images = []
+
+    gt_contours = []
+
+    gt_masks = []
+
+    files = os.listdir(images_folder)
+
+    for i in range(nb_images):
+
+        filename = files[i]
+
+        # correspondant ground truth filename
+        gFilename = filename[:-3] + "layers.txt"
+
+        img = cv2.imread(os.path.join(images_folder, filename))
+
+        label_img = np.loadtxt(os.path.join(
+            ground_folder, gFilename), np.uint8)
+
+        contours, mask = labelsToContours(label_img, img)
+
+        gt_contours.append(np.array(contours))
+
+        images.append(img)
+
+        gt_masks.append(mask)
+
+    return images, gt_contours, gt_masks
 
 
 def labelsToContours(labels, image=None):
@@ -21,7 +55,7 @@ def labelsToContours(labels, image=None):
         y = labels == label
 
         y = y.astype('uint8')
-        y = morphologicalGradient(y, -3, size=2)
+        y = morphologicalGradient(y, -1, size=2)
 
         y = np.array(np.where(y == True)).T
 
@@ -39,33 +73,6 @@ def labelsToContours(labels, image=None):
 
     # print(np.array(contours).shape)
     return np.array(contours).T, mask
-
-
-def load_BSDS(images_folder, ground_folder):
-    images = []
-
-    gt_contours = []
-
-    for filename in os.listdir(images_folder):
-
-        # correspondant ground truth filename
-        gFilename = filename[:-3] + "mat"
-
-        img = cv2.imread(os.path.join(images_folder, filename))
-
-        data = io.loadmat(os.path.join(ground_folder, gFilename))
-        # loading contours
-        edge_data = data['groundTruth'][0][0][0][0][1]
-
-        # je reecupere les contours
-        gt_contours.append(np.where(edge_data == 1))
-
-        # img[np.where(edge_data == 1)] = [249, 217, 38][::-1]
-
-        images.append(img)
-        # cv2.imwrite("images/"+filename, img)
-
-    return images, gt_contours
 
 
 def plotBR(x_wp, br_wp, x_slic, br_slic, title=None):
@@ -98,7 +105,7 @@ def plotBR(x_wp, br_wp, x_slic, br_slic, title=None):
         plt.title(title)
 
     plt.legend()
-    plt.savefig('BSDS_br.jpg', bbox_inches='tight')
+    plt.savefig('SBD_br.jpg', bbox_inches='tight')
     plt.show()
 
 
@@ -132,11 +139,15 @@ def plotBR2(x_wp, y_wp, x_slic, y_slic, title=None):
         plt.title(title)
 
     plt.legend()
-    plt.savefig('BSDS_br2.jpg', bbox_inches='tight')
+    plt.savefig('SBD_br2.jpg', bbox_inches='tight')
     plt.show()
 
 
 def boundaryRecall(contours, gt_contours, min_dist=3):
+
+    # print("contours", np.array(contours).shape)
+
+    # print("ground truth", np.array(gt_contours).shape)
 
     contours = np.array(contours).T
 
@@ -215,10 +226,10 @@ steps = np.arange(10, 50, 5)
 rho = 2 / 3
 
 reg_params = [0, 4, 8, 16]
+images, gt_contours, gt_masks = load_SBD(
+    "../SBD/images/", "../SBD/labels/")
 
-images, gt_contours = load_BSDS(
-    "../BSD500/images/val/", "../BSD500/ground_truth/val/")
-# print(len(images))
+
 x_wp = np.zeros(len(steps))
 x_slic = np.zeros(len(steps))
 
@@ -260,17 +271,15 @@ for j in range(len(steps)):
 
         slic_contours, mask_slic = labelsToContours(sp_slic, image)
 
+        # print(np.array(slic_contours).shape)
+
         br_slic[j] += boundaryRecall(slic_contours, gt_contours[i])
         cd_slic[j] += np.array(slic_contours).shape[1] / \
             (image.shape[0] * image.shape[1])
 
         print("Slic superpixels ", len(np.unique(sp_slic)))
 
-        # mask_gt = np.zeros(image.shape, np.uint8)
-
-        # mask_gt[gt_contours[i]] = 255
-
-        # axs[k+1].imshow(mark_boundaries(image, sp_slic))
+        # axs[k+1].imshow(gt_masks[i])
         # axs[k+1].set_title("Ground truth")
         # axs[k+1].axis('off')
 

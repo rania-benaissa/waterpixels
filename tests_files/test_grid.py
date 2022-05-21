@@ -1,14 +1,16 @@
+import sys
+sys.path.append('../waterpixels/')
 from matplotlib import pyplot as plt
 from pytictoc import TicToc
 import cv2
-from Gradient import *
-from HexaGrid import HexaGrid
-from Voronoi_tesselation import voronoiTesselation
+from waterpixels.Gradient import *
+from waterpixels.HexaGrid import HexaGrid
+from waterpixels.Voronoi_tesselation import voronoiTesselation
 from skimage.segmentation import watershed
 import numpy as np
 
 
-def waterPixels(path, g_sigma=-1, sigma=40, rho=2/3, k=8, distType='euclidean'):
+def waterPixels(path, g_sigma=-1, sigma=40, rho=2 / 3, k=8, distType='euclidean'):
 
     # keep in mind that u get a bgr image
     img = cv2.imread(path)
@@ -66,7 +68,7 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2/3, k=8, distType='euclidean'):
 
         for i, marker in enumerate(markers):
             for point in marker:
-                markers_map[point[0], point[1]] = i+1
+                markers_map[point[0], point[1]] = i + 1
 
         # t.toc("Regu gradient")
         # t.tic()
@@ -89,52 +91,54 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2/3, k=8, distType='euclidean'):
 
     return img, visu
 
+
     # parameters
-
-
-sigma = 40
+sigma = 30
 # rho ne doit pas etre egale a 0 control that !
-rho = 2/3
+rho = 2 / 3
 
-# k = 10
-path = "images/image15.jpg"
+k = 10
+path = "images/image30.jpg"
 
 
-fig = plt.figure()
-ax1 = plt.subplot2grid((3, 4), (0, 0), rowspan=1, colspan=2)
-ax2 = plt.subplot2grid((3, 4), (0, 2), rowspan=1, colspan=2)
+fig, axs = plt.subplots(2, 3)
 
 
 im = cv2.imread(path)
 
+steps = [10, 20]
 
-ax1.imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
-ax1.set_title("Original image")
-ax1.axis('off')
+axs[0, 0].imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
+axs[0, 0].set_title("Original image")
+axs[0, 0].axis('off')
 
-k = [0, 4, 8, 16]
-for i in range(len(k)):
 
-    ax = plt.subplot2grid((3, 4), (1, i), rowspan=2)
+for i in range(len(steps)):
     t = TicToc()
     t.tic()
-    im, vis = waterPixels(path, 0.3, sigma, rho, k[i], "euclidean")
+    im, vis = waterPixels(path, 0.7, steps[i], rho, k, "euclidean")
     t.toc()
     # showing image
-    ax.imshow(cv2.cvtColor(
+    axs[0, i + 1].imshow(cv2.cvtColor(
         im.astype(np.uint8), cv2.COLOR_BGR2RGB))
-    ax.set_title(
-        "k = " + str(k[i]))
-    ax.axis('off')
+    axs[0, i + 1].set_title(
+        "Grid step = " + str(steps[i]))
+    axs[0, i + 1].axis('off')
 
- # showing image
-ax2.imshow(cv2.cvtColor(
-    vis.astype(np.uint8), cv2.COLOR_BGR2RGB))
-ax2.set_title(
-    "Voronoi Tesselations with markers")
-ax2.axis('off')
+steps = [30, 40, 50]
+for i in range(len(steps)):
+    t = TicToc()
+    t.tic()
+    im, vis = waterPixels(path, 0.7, steps[i], rho, k, "euclidean")
+    t.toc()
+    # showing image
+    axs[1, i].imshow(cv2.cvtColor(
+        im.astype(np.uint8), cv2.COLOR_BGR2RGB))
+    axs[1, i].set_title(
+        "Grid step = " + str(steps[i]))
+    axs[1, i].axis('off')
 
 
-fig.tight_layout()
+fig.tight_layout(pad=3)
 plt.show()
 fig.savefig('dist_compare.jpg', bbox_inches='tight')

@@ -328,7 +328,7 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>400</y>
+       <y>350</y>
        <width>221</width>
        <height>31</height>
       </rect>
@@ -337,58 +337,11 @@
       <string>Standard deviation</string>
      </property>
     </widget>
-    <widget class="QSlider" name="kernel_size_slider">
-     <property name="geometry">
-      <rect>
-       <x>300</x>
-       <y>270</y>
-       <width>231</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="cursor">
-      <cursorShape>OpenHandCursor</cursorShape>
-     </property>
-     <property name="minimum">
-      <number>2</number>
-     </property>
-     <property name="maximum">
-      <number>10</number>
-     </property>
-     <property name="pageStep">
-      <number>1</number>
-     </property>
-     <property name="value">
-      <number>3</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="tickPosition">
-      <enum>QSlider::NoTicks</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="kernel_size_view">
-     <property name="geometry">
-      <rect>
-       <x>540</x>
-       <y>270</y>
-       <width>51</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>0</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
     <widget class="QGroupBox" name="kernel_type">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>530</y>
+       <x>60</x>
+       <y>510</y>
        <width>531</width>
        <height>101</height>
       </rect>
@@ -399,7 +352,7 @@
      <widget class="QRadioButton" name="rect">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>80</x>
         <y>40</y>
         <width>141</width>
         <height>51</height>
@@ -415,7 +368,7 @@
      <widget class="QRadioButton" name="cross">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>360</x>
         <y>40</y>
         <width>101</width>
         <height>51</height>
@@ -425,25 +378,12 @@
        <string>Cross</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="ellipse">
-      <property name="geometry">
-       <rect>
-        <x>230</x>
-        <y>40</y>
-        <width>111</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Ellipse</string>
-      </property>
-     </widget>
     </widget>
     <widget class="QLabel" name="std_view">
      <property name="geometry">
       <rect>
        <x>540</x>
-       <y>400</y>
+       <y>350</y>
        <width>51</width>
        <height>31</height>
       </rect>
@@ -455,24 +395,11 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QLabel" name="kernel_size">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>270</y>
-       <width>221</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Kernel size</string>
-     </property>
-    </widget>
     <widget class="QSlider" name="std_slider">
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>400</y>
+       <y>350</y>
        <width>231</width>
        <height>31</height>
       </rect>
@@ -515,7 +442,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>120</y>
+        <y>70</y>
         <width>371</width>
         <height>51</height>
        </rect>
@@ -534,7 +461,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>240</y>
+        <y>210</y>
         <width>371</width>
         <height>51</height>
        </rect>
@@ -548,10 +475,7 @@
      </widget>
     </widget>
     <zorder>gradient_type</zorder>
-    <zorder>kernel_size_view</zorder>
     <zorder>kernel_type</zorder>
-    <zorder>kernel_size_slider</zorder>
-    <zorder>kernel_size</zorder>
     <zorder>std_text</zorder>
     <zorder>std_view</zorder>
     <zorder>std_slider</zorder>
@@ -726,10 +650,10 @@
    <zorder>title</zorder>
    <zorder>load_other_img</zorder>
    <zorder>browserButton</zorder>
-   <zorder>parameters</zorder>
    <zorder>loaded_img</zorder>
    <zorder>apply_waterpixels</zorder>
    <zorder>reset</zorder>
+   <zorder>parameters</zorder>
   </widget>
  </widget>
  <resources/>

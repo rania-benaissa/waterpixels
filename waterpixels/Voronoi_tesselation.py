@@ -3,6 +3,7 @@ import cv2
 from itertools import product
 from scipy.spatial.distance import cdist
 from sklearn.metrics.pairwise import euclidean_distances
+from matplotlib import pyplot as plt
 
 
 def euclidianDist(row, markers_centers):
@@ -21,12 +22,10 @@ def euclidianDist(row, markers_centers):
 
 def voronoiTesselation(shape, markers, sigma, distType='euclidean', color=[249, 217, 38][::-1], visu=False):
 
-    max_dims = 500
+    binary_img = np.full(shape[:2], 1, np.uint8)
 
     # voronoi diagram
-    diagram = np.zeros(shape)
-
-    img = list(product(np.arange(shape[0]), np.arange(shape[1])))
+    diagram = np.zeros(shape, np.uint8)
 
     markers_points = []
 
@@ -34,33 +33,18 @@ def voronoiTesselation(shape, markers, sigma, distType='euclidean', color=[249, 
 
         for point in marker:
             markers_points.append(point)
+            binary_img[point[0], point[1]] = 0
 
     # calcul pour  chaque marqueur la dist avec tous les elts de l'image
+    gray_diagram = cv2.distanceTransform(binary_img,
+                                         cv2.DIST_L2, cv2.DIST_MASK_PRECISE)
 
-    gray_diagram = []
+    gray_diagram = cv2.normalize(
+        gray_diagram, None, 0, 255, cv2.NORM_MINMAX)
 
-    if(shape[0] <= max_dims and shape[1] <= max_dims and len(markers_points) < max_dims):
-
-        dist = cdist(np.array(markers_points),
-                     np.array(img), distType)
-
-        # on reecup le min sur chaque colonne
-        gray_diagram = np.min(dist, axis=0)
-
-        gray_diagram = gray_diagram.reshape(shape[:2])
-
-    else:
-        euclidianDist.i = 0
-        gray_diagram = np.zeros(shape[:2])
-        gray_diagram = np.apply_along_axis(
-            euclidianDist, 1, gray_diagram, markers_points)
+    gray_diagram = (2 / sigma) * (gray_diagram)
 
     if(visu):
-        gray_diagram = cv2.normalize(
-            gray_diagram, None, 0, 255, cv2.NORM_MINMAX)
-
-        gray_diagram = (2 / sigma) * (gray_diagram)
-
         # # juste pour visualiser
         vis_gray_diagram = cv2.normalize(
             gray_diagram, None, 0, 255, cv2.NORM_MINMAX)

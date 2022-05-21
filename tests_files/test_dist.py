@@ -1,10 +1,11 @@
-from math import dist
+import sys
+sys.path.append('../waterpixels/')
 from matplotlib import pyplot as plt
 from pytictoc import TicToc
 import cv2
-from Gradient import *
-from HexaGrid import HexaGrid
-from Voronoi_tesselation import voronoiTesselation
+from waterpixels.Gradient import *
+from waterpixels.HexaGrid import HexaGrid
+from waterpixels.Voronoi_tesselation import voronoiTesselation
 from skimage.segmentation import watershed
 import numpy as np
 
