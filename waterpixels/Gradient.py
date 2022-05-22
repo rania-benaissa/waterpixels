@@ -37,11 +37,11 @@ def morphologicalGradient(image, value=-1, size=3):
 
     if(value == -1):
 
-        # print("Rect")
+        print("Rect")
         struct_elt = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))
 
     if(value == -2):
-        # print("Cross")
+        print("Cross")
         struct_elt = cv2.getStructuringElement(cv2.MORPH_CROSS, (size, size))
 
     return cv2.morphologyEx(img, cv2.MORPH_GRADIENT, struct_elt)

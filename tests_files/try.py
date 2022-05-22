@@ -1,10 +1,10 @@
-from dis import dis
-from matplotlib.pyplot import gray
 from scipy.spatial.distance import cdist
 import numpy as np
-from Voronoi_tesselation import voronoiTesselation
+
 from itertools import product
 import cv2
+
+
 from pytictoc import TicToc
 # a = np.random.rand(1000, 2)
 # b = np.random.rand(100000, 2)
@@ -42,21 +42,28 @@ from pytictoc import TicToc
 size = 3
 
 # print("Rect")
-struct_elt = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))
-print(struct_elt)
-# print("Ellipse")
-struct_elt = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (size, size))
+# struct_elt = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))
+# print(struct_elt)
+# # print("Ellipse")
+# struct_elt = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (size, size))
 
-print(struct_elt)
-# print("Cross")
-struct_elt = cv2.getStructuringElement(cv2.MORPH_CROSS, (size, size))
-print(struct_elt)
+# print(struct_elt)
+# # print("Cross")
+# struct_elt = cv2.getStructuringElement(cv2.MORPH_CROSS, (size, size))
+# print(struct_elt)
 
 
-# size = 11
+size = 3
 
-# binary_image = cv2.getStructuringElement(cv2.MORPH_CROSS, (size, size))
+binary_image = cv2.getStructuringElement(cv2.MORPH_CROSS, (size, size))
 
+print(binary_image)
+image = np.random.randint(5, size=(5, 5), dtype=np.uint8)
+
+print(image)
+
+print(" -----------------")
+print(cv2.morphologyEx(image, cv2.MORPH_DILATE, binary_image))
 
 # a = np.array(np.where(binary_image == 1)).T
 
@@ -74,7 +81,7 @@ print(struct_elt)
 # # print(gray_diagram.shape)
 
 
-# # print(gray_diagram)
+# print(gray_diagram)
 
 
 # binary_image = 1 - binary_image
@@ -85,4 +92,12 @@ print(struct_elt)
 # dist, voronoi = cv2.distanceTransformWithLabels(binary_image,
 #                                                 cv2.DIST_L2, cv2.DIST_MASK_PRECISE)
 # t.toc()
-# # print(np.array(dist))
+# print(np.array(dist))
+
+
+# t = TicToc()
+# t.tic()
+# dist, voronoi = cv2.distanceTransformWithLabels(binary_image,
+#                                                 cv2.DIST_L2, cv2.DIST_MASK_5)
+# t.toc()
+# print(np.array(dist))

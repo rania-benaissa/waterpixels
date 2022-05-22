@@ -184,7 +184,7 @@ steps = [30]
 # rho ne doit pas etre egale a 0 control that !
 rho = 2 / 3
 
-k = 8
+k = 4
 
 # images, _ = load_BSDS(
 #     "../../BSD500/images/val2/", "../../BSD500/ground_truth/val/")
@@ -193,7 +193,7 @@ images = []
 
 images.append(cv2.imread("../images/image1.jpg"))
 
-sigma = 1
+sigma = 0.7
 
 t = TicToc()
 

@@ -83,15 +83,15 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2 / 3, k=8):
     return img
 
     # parameters
-sigma = 35
+sigma = 30
 # rho ne doit pas etre egale a 0 control that !
 rho = 2 / 3
 
 k = 4
 
 fig = plt.figure()
-ax1 = plt.subplot2grid((3, 5), (0, 0), rowspan=1, colspan=1)
-ax2 = plt.subplot2grid((3, 5), (1, 0), rowspan=1, colspan=2)
+ax1 = plt.subplot2grid((2, 12), (0, 0), rowspan=1, colspan=3)
+ax2 = plt.subplot2grid((2, 12), (1, 0), rowspan=1, colspan=4)
 
 
 g_sigma = [0.4, 0.7, 1.0]
@@ -113,22 +113,25 @@ type = ["Cross", "Rect"]
 for i in range(len(g_sigma)):
 
     im = waterPixels(path, g_sigma[i], sigma, rho, k)
-
+    ax = plt.subplot2grid((2, 12), (0, (i + 1) * 3), rowspan=1, colspan=3)
     # showing image
-    axs[0, i + 1].imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
-    axs[0, i + 1].set_title(
+    ax.imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
+    ax.set_title(
         "Sobel with sigma = " + str(g_sigma[i]))
-    axs[0, i + 1].axis('off')
+    ax.axis('off')
 
     if(i < 2):
         # partie gradient morpho
         im = waterPixels(path, -1 - i, sigma, rho, k)
-
+        ax = plt.subplot2grid((2, 12), (1, (i + 1) * 4), rowspan=1, colspan=4)
         # showing image
-        axs[1, i + 1].imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
-        axs[1, i + 1].set_title("Morphological gradient with " +
-                                type[-1 - i] + " kernel")
-        axs[1, i + 1].axis('off')
+        ax.imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
+
+        print(-1 - i)
+        print(type[-1 - i])
+        ax.set_title("Morphological gradient with " +
+                     type[-1 - i] + " kernel")
+        ax.axis('off')
 # sobel
 # waterPixels("images/image5.jpg", True, sigma, rho, k)
 

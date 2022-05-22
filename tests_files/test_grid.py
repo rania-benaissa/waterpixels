@@ -93,7 +93,6 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2 / 3, k=8, distType='euclidean'
 
 
     # parameters
-sigma = 30
 # rho ne doit pas etre egale a 0 control that !
 rho = 2 / 3
 
@@ -116,26 +115,26 @@ axs[0, 0].axis('off')
 for i in range(len(steps)):
     t = TicToc()
     t.tic()
-    im, vis = waterPixels(path, 0.7, steps[i], rho, k, "euclidean")
+    im, vis = waterPixels(path, 0.3, steps[i], rho, k, "euclidean")
     t.toc()
     # showing image
     axs[0, i + 1].imshow(cv2.cvtColor(
         im.astype(np.uint8), cv2.COLOR_BGR2RGB))
     axs[0, i + 1].set_title(
-        "Grid step = " + str(steps[i]))
+        "p = " + str(steps[i]))
     axs[0, i + 1].axis('off')
 
 steps = [30, 40, 50]
 for i in range(len(steps)):
     t = TicToc()
     t.tic()
-    im, vis = waterPixels(path, 0.7, steps[i], rho, k, "euclidean")
+    im, vis = waterPixels(path, 0.3, steps[i], rho, k, "euclidean")
     t.toc()
     # showing image
     axs[1, i].imshow(cv2.cvtColor(
         im.astype(np.uint8), cv2.COLOR_BGR2RGB))
     axs[1, i].set_title(
-        "Grid step = " + str(steps[i]))
+        "p = " + str(steps[i]))
     axs[1, i].axis('off')
 
 
