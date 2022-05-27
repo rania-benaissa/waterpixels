@@ -82,6 +82,7 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2 / 3, k=8):
     t.toc()
     return img
 
+
     # parameters
 sigma = 30
 # rho ne doit pas etre egale a 0 control that !
@@ -116,6 +117,7 @@ for i in range(len(g_sigma)):
     ax = plt.subplot2grid((2, 12), (0, (i + 1) * 3), rowspan=1, colspan=3)
     # showing image
     ax.imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
+    cv2.imwrite("Sobel with sigma = " + str(g_sigma[i]) + ".jpg", im)
     ax.set_title(
         "Sobel with sigma = " + str(g_sigma[i]))
     ax.axis('off')
@@ -125,6 +127,8 @@ for i in range(len(g_sigma)):
         im = waterPixels(path, -1 - i, sigma, rho, k)
         ax = plt.subplot2grid((2, 12), (1, (i + 1) * 4), rowspan=1, colspan=4)
         # showing image
+        cv2.imwrite("Morphological gradient with " +
+                    type[-1 - i] + " kernel.jpg", im)
         ax.imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
 
         print(-1 - i)

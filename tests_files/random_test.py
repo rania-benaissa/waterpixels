@@ -179,10 +179,12 @@ def waterPixels(img, g_sigma=0, sigma=40, rho=2 / 3, k=8):
     return len(hexaGrid.centers)
 
     # parameters
-steps = [30]
+steps = [40]
 
 # rho ne doit pas etre egale a 0 control that !
 rho = 2 / 3
+
+print(rho)
 
 k = 4
 
@@ -193,7 +195,7 @@ images = []
 
 images.append(cv2.imread("../images/image1.jpg"))
 
-sigma = 0.7
+sigma = 1
 
 t = TicToc()
 

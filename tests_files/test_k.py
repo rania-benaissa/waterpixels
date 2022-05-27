@@ -1,5 +1,7 @@
 from matplotlib import pyplot as plt
 import sys
+
+from sqlalchemy import true
 sys.path.append('../waterpixels/')
 from pytictoc import TicToc
 import cv2
@@ -56,7 +58,8 @@ def waterPixels(path, g_sigma=-1, sigma=40, rho=2 / 3, k=8, distType='euclidean'
         # t.tic()
 
         distImage, visu = voronoiTesselation(
-            img.shape, markers, sigma, distType)
+            img.shape, markers, sigma, distType,
+            visu=True)
 
         #t.toc("Compute Veronoi tesselations")
 
@@ -99,7 +102,7 @@ sigma = 40
 rho = 2 / 3
 
 # k = 10
-path = "images/image15.jpg"
+path = "../images/image30.jpg"
 
 
 fig = plt.figure()
@@ -122,16 +125,21 @@ for i in range(len(k)):
     t.tic()
     im, vis = waterPixels(path, 0.3, sigma, rho, k[i], "euclidean")
     t.toc()
+
+    cv2.imwrite("k = " + str(k[i]) + ".jpg", im)
     # showing image
     ax.imshow(cv2.cvtColor(
         im.astype(np.uint8), cv2.COLOR_BGR2RGB))
+
     ax.set_title(
         "k = " + str(k[i]))
     ax.axis('off')
 
- # showing image
+cv2.imwrite("vis.jpg", vis)
+# showing image
 ax2.imshow(cv2.cvtColor(
     vis.astype(np.uint8), cv2.COLOR_BGR2RGB))
+
 ax2.set_title(
     "Voronoi Tesselations with markers")
 ax2.axis('off')

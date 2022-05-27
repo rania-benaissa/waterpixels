@@ -55,15 +55,21 @@ size = 3
 
 size = 3
 
-binary_image = cv2.getStructuringElement(cv2.MORPH_CROSS, (size, size))
+binary_image = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))
 
 print(binary_image)
-image = np.random.randint(5, size=(5, 5), dtype=np.uint8)
+
+image = np.zeros((5, 5), dtype=np.uint8)
+
+for i in range(size):
+    for j in range(size):
+        image[j + 1, + i + 1] = (i + 1) + j * 3
+
 
 print(image)
 
 print(" -----------------")
-print(cv2.morphologyEx(image, cv2.MORPH_DILATE, binary_image))
+print(cv2.morphologyEx(image, cv2.MORPH_ERODE, binary_image))
 
 # a = np.array(np.where(binary_image == 1)).T
 
