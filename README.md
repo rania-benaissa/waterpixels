@@ -11,5 +11,5 @@ The desktop application is built using `PyQT5`. Once you run the application fil
 
 You can then visualize the segmentation's results as follows : 
 
-![Interface 2](/interface1.png)
+![Interface 2](/interface2.png)
 
