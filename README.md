@@ -5,7 +5,7 @@ A Python implementation of the Waterpixels segmentation algorithm based on the f
 
 ## Usage
 
-The desktop application is built using `PyQT5`. Once you run the application file `applicaion.py`, load the image to segment and adjust the parameters accordingly :
+The desktop application is built using `PyQT5`. Once you run the application file `application.py`, load the image to segment and adjust the parameters accordingly :
 
 ![Interface 1](/interface1.png)
 
