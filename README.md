@@ -1,6 +1,6 @@
 # waterpixels
 
-A Python implementation of the Waterpixels segmentation algorithm based on the following research paper : [Waterpixels](https://hal.archives-ouvertes.fr/hal-01212760/document).
+A Python implementation of the Waterpixels segmentation algorithm based on the following research paper : [Waterpixels](https://hal.archives-ouvertes.fr/hal-01212760/document). For further explanations, you can also refer to my [ project report (in french)](BENAISSA_Rania_Rapport_PIMA)
 
 
 ## Usage
